@@ -1,0 +1,3180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prodigy — Build Digital Products Like a Pro</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════ */
+:root {
+  /* Backgrounds */
+  --cream:       #FAF8F4;
+  --cream-2:     #F4F1EA;
+  --cream-3:     #EDE8DE;
+  --white:       #FFFEFB;
+
+  /* Accent — Violet */
+  --violet:      #6D4AFF;
+  --violet-2:    #8B6EFF;
+  --violet-soft: #EDEBFF;
+  --violet-dim:  rgba(109,74,255,0.08);
+  --violet-b:    rgba(109,74,255,0.2);
+
+  /* Accent — Rose */
+  --rose:        #D4624A;
+  --rose-soft:   #FFF0ED;
+  --rose-dim:    rgba(212,98,74,0.1);
+  --rose-b:      rgba(212,98,74,0.2);
+
+  /* Accent — Sage */
+  --sage:        #4A8C6F;
+  --sage-soft:   #EBF5F0;
+  --sage-dim:    rgba(74,140,111,0.1);
+  --sage-b:      rgba(74,140,111,0.2);
+
+  /* Ink */
+  --ink:         #1C1814;
+  --ink-2:       #3A3530;
+  --ink-3:       #6B6560;
+  --ink-4:       #9E9890;
+
+  /* Borders & Shadows */
+  --border:      rgba(28,24,20,0.1);
+  --border-2:    rgba(28,24,20,0.06);
+  --shadow-sm:   0 1px 8px rgba(28,24,20,0.06), 0 2px 4px rgba(28,24,20,0.04);
+  --shadow-md:   0 4px 20px rgba(28,24,20,0.08), 0 8px 16px rgba(28,24,20,0.04);
+  --shadow-lg:   0 12px 48px rgba(28,24,20,0.12), 0 24px 32px rgba(28,24,20,0.06);
+
+  /* Layout */
+  --nav-h:    64px;
+  --sb-w:     256px;
+  --r:        18px;
+  --r-sm:     12px;
+  --r-xs:     8px;
+  --pad:      28px;
+}
+
+/* ═══════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: 'DM Sans', sans-serif; cursor: pointer; border: none; outline: none; }
+input, textarea, select { font-family: 'DM Sans', sans-serif; outline: none; }
+.hidden { display: none !important; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--cream-2); }
+::-webkit-scrollbar-thumb { background: var(--cream-3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-4); }
+
+/* ═══════════════════════════════════════════
+   NAVBAR
+═══════════════════════════════════════════ */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+  height: var(--nav-h);
+  background: rgba(250,248,244,0.94);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 24px; gap: 16px;
+}
+
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; flex-shrink: 0; text-decoration: none;
+}
+.nav-logo-mark {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 900; color: var(--cream);
+  letter-spacing: -1px;
+}
+.nav-logo-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 700;
+  color: var(--ink); letter-spacing: -0.4px;
+}
+.nav-logo-name span { color: var(--violet); }
+
+.nav-center { flex: 1; display: flex; justify-content: center; }
+.nav-tabs { display: flex; background: var(--cream-2); border: 1px solid var(--border); border-radius: 30px; padding: 4px; gap: 2px; }
+.nav-tab {
+  padding: 7px 20px; border-radius: 24px;
+  font-size: 13px; font-weight: 500; color: var(--ink-3);
+  background: none; border: none; cursor: pointer;
+  transition: all 0.2s; white-space: nowrap;
+}
+.nav-tab:hover { color: var(--ink); }
+.nav-tab.active { background: var(--white); color: var(--ink); font-weight: 600; box-shadow: var(--shadow-sm); }
+
+.nav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.nav-prog-wrap { display: flex; align-items: center; gap: 8px; }
+.nav-prog-txt { font-size: 12px; color: var(--ink-3); font-weight: 500; white-space: nowrap; }
+.nav-prog-bar { width: 72px; height: 3px; background: var(--cream-3); border-radius: 2px; overflow: hidden; }
+.nav-prog-fill { height: 100%; background: linear-gradient(90deg, var(--violet), var(--rose)); border-radius: 2px; transition: width 0.5s; }
+.mob-btn {
+  display: none; width: 38px; height: 38px; border-radius: 10px;
+  background: var(--cream-2); border: 1px solid var(--border);
+  color: var(--ink-3); font-size: 17px;
+  align-items: center; justify-content: center;
+}
+
+/* ═══════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════ */
+.app-layout { display: flex; padding-top: var(--nav-h); min-height: 100vh; }
+
+/* ═══════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════ */
+.sidebar {
+  width: var(--sb-w); flex-shrink: 0;
+  position: fixed; top: var(--nav-h); left: 0;
+  height: calc(100vh - var(--nav-h));
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  overflow-y: auto; overflow-x: hidden;
+  z-index: 800; transition: transform 0.3s ease;
+  padding: 18px 10px 32px;
+}
+.sidebar::-webkit-scrollbar { width: 3px; }
+
+/* Profile pill */
+.sb-profile {
+  margin-bottom: 16px; padding: 14px 12px;
+  background: linear-gradient(135deg, var(--violet-soft), var(--cream-2));
+  border: 1px solid var(--violet-b); border-radius: var(--r-sm);
+  cursor: pointer; transition: all 0.2s;
+}
+.sb-profile:hover { border-color: var(--violet); }
+.sb-p-name { font-size: 12px; font-weight: 700; color: var(--ink-2); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-p-sub { font-size: 11px; color: var(--ink-3); margin-bottom: 10px; }
+.sb-p-bar { height: 3px; background: rgba(109,74,255,0.12); border-radius: 2px; overflow: hidden; }
+.sb-p-fill { height: 100%; background: var(--violet); border-radius: 2px; transition: width 0.5s; }
+
+/* Section label */
+.sb-section { padding: 14px 6px 4px; }
+.sb-section-label {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--ink-4); font-weight: 600; margin-bottom: 5px;
+  padding: 0 6px;
+}
+.sb-badge {
+  font-size: 8px; padding: 2px 7px; border-radius: 20px;
+  font-weight: 700; letter-spacing: 0.5px;
+}
+.sb-badge.violet { background: var(--violet-soft); color: var(--violet); }
+.sb-badge.rose   { background: var(--rose-soft);   color: var(--rose);   }
+.sb-badge.sage   { background: var(--sage-soft);   color: var(--sage);   }
+
+/* Nav item */
+.sb-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 12px; margin-bottom: 2px;
+  border-radius: var(--r-xs);
+  font-size: 13px; font-weight: 500; color: var(--ink-3);
+  cursor: pointer; transition: all 0.15s;
+  border: 1px solid transparent; user-select: none;
+}
+.sb-item:hover { background: var(--cream-2); color: var(--ink); }
+.sb-item.active { background: var(--violet-soft); border-color: var(--violet-b); color: var(--violet); font-weight: 600; }
+.sb-item.active.rose { background: var(--rose-soft); border-color: var(--rose-b); color: var(--rose); }
+.sb-item.active.sage { background: var(--sage-soft); border-color: var(--sage-b); color: var(--sage); }
+.sb-icon { width: 18px; text-align: center; font-size: 14px; flex-shrink: 0; }
+.sb-check { margin-left: auto; font-size: 10px; color: var(--sage); font-weight: 700; }
+.sb-new { margin-left: auto; font-size: 8px; font-weight: 700; padding: 2px 6px; border-radius: 20px; background: var(--violet-soft); color: var(--violet); }
+.sb-divider { height: 1px; background: var(--border-2); margin: 10px 6px; }
+
+/* Overlay mobile */
+.sb-overlay { display: none; position: fixed; inset: 0; background: rgba(28,24,20,0.5); z-index: 799; backdrop-filter: blur(4px); }
+.sb-overlay.open { display: block; }
+
+/* ═══════════════════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════════════════ */
+.main-wrap { flex: 1; margin-left: var(--sb-w); min-width: 0; }
+
+/* Progress strip */
+.progress-strip {
+  position: sticky; top: var(--nav-h); z-index: 700;
+  background: rgba(250,248,244,0.95); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 32px;
+  display: flex; align-items: center; gap: 14px;
+}
+.ps-label { font-size: 12px; color: var(--ink-3); white-space: nowrap; font-weight: 500; }
+.ps-track { flex: 1; max-width: 180px; height: 3px; background: var(--cream-3); border-radius: 2px; overflow: hidden; }
+.ps-fill { height: 100%; background: linear-gradient(90deg, var(--violet), var(--rose)); border-radius: 2px; transition: width 0.5s; }
+.ps-right { margin-left: auto; display: flex; gap: 8px; }
+
+/* Screen container */
+.screen {
+  display: none;
+  padding: 36px 32px;
+  max-width: 960px;
+  animation: screenIn 0.28s ease;
+}
+.screen.active { display: block; }
+@keyframes screenIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* ═══════════════════════════════════════════
+   HOME HERO
+═══════════════════════════════════════════ */
+.hero {
+  padding: 56px 0 48px;
+  max-width: 660px;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--violet); margin-bottom: 22px;
+  border: 1px solid var(--violet-b);
+  padding: 6px 14px; border-radius: 20px;
+  background: var(--violet-soft);
+}
+.hero-eyebrow::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--violet); animation: breathe 2s ease-in-out infinite;
+}
+@keyframes breathe { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.7)} }
+
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 5.5vw, 56px);
+  font-weight: 900; line-height: 1.08;
+  letter-spacing: -2px; margin-bottom: 20px;
+}
+.hero-title em { font-style: italic; color: var(--violet); }
+.hero-sub {
+  font-size: 17px; color: var(--ink-3);
+  line-height: 1.75; max-width: 500px;
+  margin-bottom: 36px; font-weight: 400;
+}
+.hero-search-bar {
+  display: flex; align-items: center; gap: 10px;
+  max-width: 520px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 40px;
+  padding: 6px 6px 6px 22px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s; margin-bottom: 56px;
+}
+.hero-search-bar:focus-within { border-color: var(--violet); box-shadow: 0 0 0 4px var(--violet-dim); }
+.hero-search-bar input { flex: 1; background: none; border: none; font-size: 14px; color: var(--ink); }
+.hero-search-bar input::placeholder { color: var(--ink-4); }
+
+/* ═══════════════════════════════════════════
+   WING CARDS (Home)
+═══════════════════════════════════════════ */
+.section-eyebrow {
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink-4); font-weight: 600;
+  text-align: center; margin-bottom: 18px;
+}
+.wings-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 52px; }
+.wing-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r); padding: var(--pad);
+  cursor: pointer; transition: all 0.28s;
+  position: relative; overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.wing-card::before {
+  content: ''; position: absolute;
+  bottom: 0; left: 0; right: 0; height: 3px;
+  background: var(--violet);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.3s;
+}
+.wing-card:hover { transform: translateY(-4px); border-color: var(--violet-b); box-shadow: var(--shadow-md); }
+.wing-card:hover::before { transform: scaleX(1); }
+.wing-card.rose-wing::before { background: var(--rose); }
+.wing-card.rose-wing:hover { border-color: var(--rose-b); }
+.wing-card.sage-wing::before { background: var(--sage); }
+.wing-card.sage-wing:hover { border-color: var(--sage-b); }
+.wc-emoji { font-size: 32px; margin-bottom: 16px; display: block; }
+.wc-count {
+  position: absolute; top: 18px; right: 18px;
+  font-size: 10px; font-weight: 600; color: var(--ink-4);
+  background: var(--cream-2); padding: 3px 10px;
+  border-radius: 20px; border: 1px solid var(--border);
+}
+.wc-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; font-weight: 700; margin-bottom: 8px; color: var(--ink);
+}
+.wc-desc { font-size: 13px; color: var(--ink-3); line-height: 1.6; }
+
+/* Tool grid */
+.tg-eyebrow {
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink-4); font-weight: 600; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 12px;
+}
+.tg-eyebrow::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px,1fr)); gap: 10px; margin-bottom: 40px; }
+.tc {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--r-sm); padding: 16px;
+  cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-sm);
+}
+.tc:hover { transform: translateY(-2px); border-color: var(--violet-b); box-shadow: var(--shadow-md); }
+.tc.done { border-color: var(--sage-b); background: var(--sage-soft); }
+.tc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.tc-icon { font-size: 22px; }
+.tc-done-lbl { font-size: 9px; font-weight: 700; color: var(--sage); font-family: 'DM Mono', monospace; }
+.tc-title { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.tc-group { font-size: 10px; color: var(--ink-4); }
+
+/* ═══════════════════════════════════════════
+   SECTION HEADER (module pages)
+═══════════════════════════════════════════ */
+.sec-head { margin-bottom: 28px; }
+.sec-eyebrow {
+  font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--violet); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px; font-weight: 600;
+}
+.sec-eyebrow::before { content: ''; width: 22px; height: 1.5px; background: var(--violet); flex-shrink: 0; }
+.sec-eyebrow.rose  { color: var(--rose); } .sec-eyebrow.rose::before  { background: var(--rose);  }
+.sec-eyebrow.sage  { color: var(--sage); } .sec-eyebrow.sage::before  { background: var(--sage);  }
+.sec-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px; font-weight: 800; line-height: 1.18;
+  letter-spacing: -0.5px; margin-bottom: 10px; color: var(--ink);
+}
+.sec-title em { font-style: italic; color: var(--violet); }
+.sec-desc { font-size: 15px; color: var(--ink-3); line-height: 1.7; max-width: 560px; }
+.standalone-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 600; color: var(--sage);
+  background: var(--sage-soft); border: 1px solid var(--sage-b);
+  padding: 5px 13px; border-radius: 20px; margin-bottom: 22px;
+}
+
+/* ═══════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════ */
+.card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r); padding: var(--pad);
+  margin-bottom: 16px; box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: var(--violet-b); }
+.card.violet { border-color: var(--violet-b); background: linear-gradient(135deg, var(--violet-soft), var(--white)); }
+.card.rose   { border-color: var(--rose-b);   background: linear-gradient(135deg, var(--rose-soft),   var(--white)); }
+.card.sage   { border-color: var(--sage-b);   background: linear-gradient(135deg, var(--sage-soft),   var(--white)); }
+.card-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; color: var(--ink); }
+.card-desc  { font-size: 13px; color: var(--ink-3); margin-bottom: 22px; line-height: 1.65; }
+
+/* ═══════════════════════════════════════════
+   IDEA VALIDATOR / MENTOR
+═══════════════════════════════════════════ */
+.idea-choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.idea-choice {
+  padding: 28px 22px; text-align: center;
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--r); cursor: pointer; transition: all 0.25s;
+  box-shadow: var(--shadow-sm);
+}
+.idea-choice:hover { border-color: var(--violet); transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.idea-choice-icon { font-size: 36px; margin-bottom: 12px; display: block; }
+.idea-choice-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--ink); }
+.idea-choice-desc { font-size: 13px; color: var(--ink-3); line-height: 1.6; }
+
+/* Idea categories */
+.idea-cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 10px; margin: 16px 0; }
+.idea-cat {
+  background: var(--cream-2); border: 1.5px solid var(--border);
+  border-radius: var(--r-sm); padding: 16px 12px; text-align: center;
+  cursor: pointer; transition: all 0.2s;
+}
+.idea-cat:hover, .idea-cat.sel { border-color: var(--violet); background: var(--violet-soft); transform: translateY(-2px); }
+.idea-cat-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+.idea-cat-name { font-size: 12px; font-weight: 700; color: var(--ink); }
+
+/* Idea options list */
+.idea-opt-list { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
+.idea-opt {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; background: var(--white);
+  border: 1.5px solid var(--border); border-radius: var(--r-sm);
+  cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-sm);
+}
+.idea-opt:hover, .idea-opt.sel { border-color: var(--violet); background: var(--violet-soft); }
+.idea-opt-icon { font-size: 20px; flex-shrink: 0; }
+.idea-opt-body .idea-opt-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+.idea-opt-body .idea-opt-note { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+
+/* Format grid */
+.format-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 10px; margin: 14px 0; }
+.fmt {
+  background: var(--cream-2); border: 1.5px solid var(--border);
+  border-radius: var(--r-sm); padding: 16px 10px; text-align: center;
+  cursor: pointer; transition: all 0.2s;
+}
+.fmt:hover, .fmt.sel { border-color: var(--violet); background: var(--violet-soft); transform: translateY(-2px); }
+.fmt-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+.fmt-name { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.fmt-note { font-size: 10px; color: var(--ink-4); }
+
+/* Mentor chat window */
+.mentor-win {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r); overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.mentor-header {
+  padding: 16px 22px;
+  background: var(--ink);
+  display: flex; align-items: center; gap: 12px;
+}
+.mentor-av {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--violet);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(109,74,255,0.3);
+}
+.mentor-name-wrap .mentor-name { font-size: 14px; font-weight: 700; color: var(--cream); }
+.mentor-name-wrap .mentor-sub  { font-size: 11px; color: var(--ink-4); }
+.mentor-online {
+  margin-left: auto; display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--sage); font-weight: 600;
+}
+.mentor-online::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--sage); animation: breathe 2s infinite;
+}
+.mentor-msgs {
+  height: 380px; overflow-y: auto; padding: 22px;
+  display: flex; flex-direction: column; gap: 16px;
+  background: var(--cream);
+}
+.mentor-msgs::-webkit-scrollbar { width: 3px; }
+.mmsg { display: flex; gap: 10px; animation: screenIn 0.22s ease; }
+.mmsg.user { flex-direction: row-reverse; }
+.mmsg-av {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0; margin-top: 2px;
+}
+.mmsg.mentor .mmsg-av { background: var(--ink); color: var(--cream); font-size: 12px; }
+.mmsg.user   .mmsg-av { background: var(--violet); color: white; font-size: 12px; }
+.mmsg-bub { max-width: 82%; padding: 12px 16px; border-radius: 16px; font-size: 14px; line-height: 1.7; }
+.mmsg.mentor .mmsg-bub { background: var(--white); color: var(--ink-2); border-bottom-left-radius: 4px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.mmsg.user   .mmsg-bub { background: var(--violet); color: white; border-bottom-right-radius: 4px; }
+.mmsg-bub strong { color: var(--violet); }
+.mmsg.user .mmsg-bub strong { color: var(--violet-soft); }
+.mentor-foot {
+  display: flex; gap: 10px; padding: 16px 22px;
+  border-top: 1px solid var(--border); background: var(--white);
+}
+.mentor-foot input {
+  flex: 1; background: var(--cream); border: 1.5px solid var(--border);
+  border-radius: 30px; padding: 11px 18px; color: var(--ink); font-size: 14px;
+  transition: all 0.2s;
+}
+.mentor-foot input:focus { border-color: var(--violet); box-shadow: 0 0 0 3px var(--violet-dim); }
+.mentor-foot input::placeholder { color: var(--ink-4); }
+
+/* Verdict badges */
+.verdict { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 700; margin: 8px 0; }
+.verdict.go     { background: var(--sage-soft); color: var(--sage); border: 1.5px solid var(--sage-b); }
+.verdict.refine { background: var(--rose-soft); color: var(--rose); border: 1.5px solid var(--rose-b); }
+.verdict.strong { background: var(--violet-soft); color: var(--violet); border: 1.5px solid var(--violet-b); }
+
+/* Platform & Marketplace pickers */
+.platform-grid  { display: grid; grid-template-columns: repeat(auto-fill,minmax(110px,1fr)); gap: 10px; margin: 14px 0; }
+.market-grid    { display: grid; grid-template-columns: repeat(auto-fill,minmax(130px,1fr)); gap: 10px; margin: 14px 0; }
+.picker-card {
+  background: var(--cream-2); border: 1.5px solid var(--border);
+  border-radius: var(--r-sm); padding: 16px 10px; text-align: center;
+  cursor: pointer; transition: all 0.2s;
+}
+.picker-card:hover, .picker-card.sel { border-color: var(--violet); background: var(--violet-soft); transform: translateY(-2px); }
+.picker-card.rose:hover, .picker-card.rose.sel { border-color: var(--rose-b); background: var(--rose-soft); }
+.picker-icon { font-size: 26px; margin-bottom: 7px; display: block; }
+.picker-name { font-size: 12px; font-weight: 700; color: var(--ink); }
+.picker-note { font-size: 10px; color: var(--ink-4); margin-top: 2px; }
+
+/* ═══════════════════════════════════════════
+   FORMS
+═══════════════════════════════════════════ */
+.form-label {
+  display: block; font-size: 11px; font-weight: 700;
+  color: var(--ink-3); letter-spacing: 0.8px; text-transform: uppercase;
+  margin-bottom: 9px;
+}
+.form-input, .form-textarea, .form-select {
+  width: 100%; background: var(--cream);
+  border: 1.5px solid var(--border); border-radius: var(--r-sm);
+  padding: 13px 18px; color: var(--ink);
+  font-size: 14px; line-height: 1.6; transition: all 0.2s;
+}
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+  border-color: var(--violet);
+  box-shadow: 0 0 0 4px var(--violet-dim);
+  background: var(--white);
+}
+.form-input::placeholder, .form-textarea::placeholder { color: var(--ink-4); }
+.form-textarea { resize: vertical; min-height: 100px; }
+.form-select {
+  appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239E9890' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 16px center;
+  padding-right: 40px;
+}
+.form-select option { background: #FAF8F4; }
+.form-hint { font-size: 11px; color: var(--ink-4); margin-top: 7px; }
+.form-group { margin-bottom: 20px; }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-row-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+
+/* ═══════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: none; border-radius: 30px;
+  padding: 13px 26px; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.25s; white-space: nowrap; line-height: 1;
+}
+.btn-primary {
+  background: var(--ink); color: var(--cream);
+  box-shadow: 0 4px 16px rgba(28,24,20,0.2);
+}
+.btn-primary:hover { background: var(--ink-2); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(28,24,20,0.25); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.btn-violet {
+  background: var(--violet); color: white;
+  box-shadow: 0 4px 16px rgba(109,74,255,0.3);
+}
+.btn-violet:hover { background: #5B3AE8; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(109,74,255,0.4); }
+
+.btn-rose {
+  background: var(--rose); color: white;
+  box-shadow: 0 4px 16px rgba(212,98,74,0.3);
+}
+.btn-rose:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(212,98,74,0.4); }
+
+.btn-sage {
+  background: var(--sage); color: white;
+  box-shadow: 0 4px 16px rgba(74,140,111,0.3);
+}
+.btn-sage:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(74,140,111,0.4); }
+
+.btn-outline {
+  background: transparent; color: var(--ink-2);
+  border: 1.5px solid var(--border);
+}
+.btn-outline:hover { border-color: var(--violet); color: var(--violet); background: var(--violet-soft); }
+
+.btn-sm { padding: 9px 18px; font-size: 13px; border-radius: 24px; }
+.btn-xs { padding: 6px 13px; font-size: 11px; border-radius: 18px; }
+.btn-row { display: flex; align-items: center; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+
+/* ═══════════════════════════════════════════
+   LOADING STATE
+═══════════════════════════════════════════ */
+.loading-state {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 16px; padding: 52px 20px;
+}
+.spinner {
+  width: 38px; height: 38px;
+  border: 2.5px solid var(--cream-3);
+  border-top-color: var(--violet);
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--violet); animation: pulse 1.5s infinite;
+}
+.loading-sub { font-size: 12px; color: var(--ink-4); }
+@keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+
+/* ═══════════════════════════════════════════
+   OUTPUT AREA
+═══════════════════════════════════════════ */
+.output {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--r); padding: 28px;
+  margin-top: 16px; font-size: 14px; line-height: 1.8; color: var(--ink-2);
+  box-shadow: var(--shadow-sm);
+}
+.output h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--violet); margin: 22px 0 10px; font-weight: 700; }
+.output h3:first-child { margin-top: 0; }
+.output p { color: var(--ink-3); margin-bottom: 10px; }
+.output strong { color: var(--ink); }
+.output ul { list-style: none; padding: 0; }
+.output ul li { padding: 9px 0; border-bottom: 1px solid var(--border-2); color: var(--ink-3); display: flex; gap: 10px; }
+.output ul li:last-child { border-bottom: none; }
+.output ul li::before { content: '◦'; color: var(--violet); flex-shrink: 0; font-size: 16px; line-height: 1.4; }
+
+/* Content boxes */
+.hl-box { background: linear-gradient(135deg,var(--violet-soft),var(--cream-2)); border: 1.5px solid var(--violet-b); border-radius: var(--r-sm); padding: 18px 22px; margin: 14px 0; }
+.hl-box .hl-tag { font-family:'DM Mono',monospace; font-size:8px;letter-spacing:2px;color:var(--violet);text-transform:uppercase;margin-bottom:6px;font-weight:700; }
+.hl-box p { font-size:15px;color:var(--ink)!important;font-weight:500;line-height:1.65;margin:0!important; }
+
+.blue-box { background:var(--violet-soft);border:1.5px solid var(--violet-b);border-radius:var(--r-sm);padding:18px 22px;margin:14px 0; }
+.blue-box .bl-tag { font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--violet);text-transform:uppercase;margin-bottom:6px;font-weight:700; }
+.blue-box p { font-size:13px;color:var(--ink-2)!important;line-height:1.7;margin:0!important; }
+
+.purple-box { background:var(--rose-soft);border:1.5px solid var(--rose-b);border-radius:var(--r-sm);padding:18px 22px;margin:14px 0; }
+.purple-box .pl-tag { font-family:'DM Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--rose);text-transform:uppercase;margin-bottom:6px;font-weight:700; }
+.purple-box p { font-size:13px;color:var(--ink-2)!important;line-height:1.7;margin:0!important; }
+
+.mod-card { background:var(--cream-2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:16px 20px;margin-bottom:10px; }
+.mod-card .mod-num { font-family:'DM Mono',monospace;font-size:8px;color:var(--violet);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;font-weight:700; }
+.mod-card h4 { font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:4px;color:var(--ink); }
+.mod-card p { font-size:12px;color:var(--ink-3);line-height:1.55;margin:0!important; }
+
+.info-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:10px;margin:14px 0; }
+.info-cell { background:var(--cream-2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:12px 14px; }
+.info-cell .ic-label { font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;color:var(--ink-4);text-transform:uppercase;margin-bottom:4px;font-weight:700; }
+.info-cell .ic-val { font-size:13px;font-weight:700;color:var(--ink); }
+
+.tag-row { display:flex;flex-wrap:wrap;gap:6px;margin:10px 0; }
+.tag { font-size:11px;padding:4px 12px;border-radius:20px;background:var(--violet-soft);border:1px solid var(--violet-b);color:var(--violet);font-weight:600; }
+.tag.rose { background:var(--rose-soft);border-color:var(--rose-b);color:var(--rose); }
+.tag.sage { background:var(--sage-soft);border-color:var(--sage-b);color:var(--sage); }
+
+.data-table { width:100%;border-collapse:collapse;margin:14px 0;font-size:13px; }
+.data-table th { background:var(--violet-soft);color:var(--violet);font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:2px solid var(--violet-b);font-weight:700; }
+.data-table td { padding:10px 14px;border-bottom:1px solid var(--border-2);color:var(--ink-3);vertical-align:top; }
+.data-table tr:last-child td { border-bottom:none; }
+.data-table tr:hover td { background:var(--cream-2);color:var(--ink); }
+
+.copy-section { border:1.5px solid var(--border);border-radius:var(--r-sm);overflow:hidden;margin-bottom:10px;box-shadow:var(--shadow-sm); }
+.copy-section-head { display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--cream-2);cursor:pointer;user-select:none;transition:background 0.15s; }
+.copy-section-head:hover { background:var(--cream-3); }
+.copy-section-head h4 { font-size:13px;font-weight:700;color:var(--ink); }
+.csh-right { display:flex;align-items:center;gap:10px; }
+.cs-tag { font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;font-weight:700; }
+.cs-tag.blue{color:var(--violet)} .cs-tag.purple{color:var(--rose)} .cs-tag.green{color:var(--sage)}
+.cs-chevron { font-size:10px;color:var(--ink-4);transition:transform 0.2s; }
+.copy-section-body { padding:20px;background:var(--white);font-size:13px;line-height:1.8;color:var(--ink-3);display:none; }
+.copy-section-body.open { display:block; }
+.copy-section-body strong { color:var(--ink); }
+
+.divider { height:1px;background:var(--border);margin:22px 0; }
+.error-box { background:var(--rose-soft);border:1.5px solid var(--rose-b);border-radius:var(--r-sm);padding:12px 18px;font-size:13px;color:var(--rose);margin-top:12px; }
+
+/* Auto flow */
+.auto-flow { display:flex;flex-direction:column; }
+.auto-step { display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--border-2); }
+.auto-step:last-child { border-bottom:none; }
+.auto-icon-col { display:flex;flex-direction:column;align-items:center;flex-shrink:0; }
+.auto-circle { width:38px;height:38px;border-radius:50%;background:var(--violet-soft);border:1.5px solid var(--violet-b);display:flex;align-items:center;justify-content:center;font-size:17px; }
+.auto-line { width:1.5px;flex:1;background:var(--border);margin:4px 0;min-height:16px; }
+.auto-content { flex:1;padding-top:4px; }
+.auto-content h4 { font-size:13px;font-weight:700;margin-bottom:4px;color:var(--ink); }
+.auto-content p { font-size:12px;color:var(--ink-3);line-height:1.55; }
+.auto-tool { display:inline-block;margin-top:6px;font-family:'DM Mono',monospace;font-size:9px;padding:3px 10px;border-radius:20px;background:var(--violet-soft);color:var(--violet);border:1px solid var(--violet-b);font-weight:600; }
+
+/* SEO meta */
+.seo-meta-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0; }
+.seo-cell { background:var(--cream-2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:12px 14px; }
+.seo-cell .sc-lbl { font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1.5px;color:var(--ink-4);text-transform:uppercase;margin-bottom:4px;font-weight:700; }
+.seo-cell .sc-val { font-size:12px;font-weight:700;color:var(--ink); }
+
+/* Image studio */
+.studio-wrap { display:grid;grid-template-columns:1fr 1fr;gap:20px; }
+.style-chip-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0; }
+.style-chip { padding:9px 8px;border-radius:var(--r-xs);border:1.5px solid var(--border);background:var(--cream-2);font-size:11px;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:center;color:var(--ink-3); }
+.style-chip:hover,.style-chip.active { border-color:var(--violet);color:var(--violet);background:var(--violet-soft); }
+.img-gen-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px; }
+.img-slot { border-radius:var(--r-sm);overflow:hidden;border:1.5px solid var(--border);background:var(--cream-2);aspect-ratio:1;position:relative;cursor:pointer;transition:border-color 0.2s; }
+.img-slot:hover { border-color:var(--violet); }
+.img-slot img { width:100%;height:100%;object-fit:cover; }
+.img-placeholder { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;height:100%;color:var(--ink-4); }
+.img-placeholder span { font-size:28px; }
+.img-placeholder p { font-size:10px;font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase; }
+.img-overlay { position:absolute;bottom:0;left:0;right:0;background:rgba(28,24,20,0.88);padding:8px;display:flex;gap:6px;opacity:0;transition:opacity 0.2s; }
+.img-slot:hover .img-overlay { opacity:1; }
+.saved-imgs-row { display:flex;flex-wrap:wrap;gap:8px;margin-top:14px; }
+.saved-thumb { width:58px;height:58px;border-radius:var(--r-xs);overflow:hidden;border:1.5px solid var(--border);cursor:pointer; }
+.saved-thumb:hover { border-color:var(--rose); }
+.saved-thumb img { width:100%;height:100%;object-fit:cover; }
+
+/* Quiz */
+.quiz-controls { display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px; }
+.quiz-q { background:var(--cream-2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:16px 18px;margin-bottom:10px; }
+.quiz-q .q-num { font-family:'DM Mono',monospace;font-size:8px;color:var(--violet);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;font-weight:700; }
+.quiz-q .q-text { font-size:14px;font-weight:700;margin-bottom:12px;color:var(--ink); }
+.quiz-q .q-opts { display:flex;flex-direction:column;gap:6px; }
+.quiz-q .q-opt { padding:9px 14px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-xs);font-size:12px;color:var(--ink-3); }
+.quiz-q .q-opt.correct { border-color:var(--sage-b);color:var(--sage);background:var(--sage-soft);font-weight:600; }
+.quiz-q .q-explain { font-size:11px;color:var(--ink-4);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-style:italic; }
+
+/* Profile screens */
+.restore-banner { background:var(--sage-soft);border:1.5px solid var(--sage-b);border-radius:var(--r-sm);padding:16px 20px;margin-bottom:20px; }
+.rb-label { font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--sage);text-transform:uppercase;margin-bottom:6px;font-weight:700; }
+.mvp-banner {
+  display:flex;align-items:center;gap:16px;
+  background:linear-gradient(135deg,var(--violet-soft),var(--cream-2));
+  border:1.5px solid var(--violet-b);border-radius:var(--r-sm);
+  padding:18px 22px;margin-bottom:22px;flex-wrap:wrap;
+}
+.mvp-icon { font-size:26px;flex-shrink:0; }
+.mvp-text strong { display:block;font-family:'Playfair Display',serif;font-size:15px;color:var(--violet);margin-bottom:3px; }
+.mvp-text span { font-size:12px;color:var(--ink-3); }
+.mvp-cta { margin-left:auto; }
+
+/* Modal */
+.modal-overlay { position:fixed;inset:0;z-index:1000;background:rgba(28,24,20,0.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px; }
+.modal-box { background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:36px;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow-lg); }
+.modal-title { font-family:'Playfair Display',serif;font-size:24px;font-weight:800;margin-bottom:6px;color:var(--ink); }
+.modal-sub { font-size:13px;color:var(--ink-3);margin-bottom:24px; }
+.export-row { display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--cream-2);border:1.5px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px;cursor:pointer;transition:border-color 0.15s; }
+.export-row:hover { border-color:var(--violet); }
+.export-row input { accent-color:var(--violet);width:15px;height:15px;cursor:pointer; }
+.export-row label { font-size:13px;cursor:pointer;flex:1;color:var(--ink); }
+.export-status { font-family:'DM Mono',monospace;font-size:9px;font-weight:700; }
+.export-status.done { color:var(--sage); }
+.export-status.lock { color:var(--ink-4); }
+
+/* Toast */
+.toast-wrap { position:fixed;bottom:28px;right:28px;display:flex;flex-direction:column;gap:8px;z-index:9999;pointer-events:none; }
+.toast { background:var(--ink);color:var(--cream);border-radius:var(--r-sm);padding:12px 18px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;animation:toastIn 0.3s ease;pointer-events:all;box-shadow:var(--shadow-lg);max-width:300px; }
+.toast.success { background:var(--sage); }
+.toast.error   { background:var(--rose); }
+.toast.info    { background:var(--violet); }
+@keyframes toastIn { from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none} }
+
+/* Typing dots */
+.tdot { display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ink-4);animation:tdot 1.2s infinite;margin:0 2px; }
+.tdot:nth-child(2){animation-delay:0.2s} .tdot:nth-child(3){animation-delay:0.4s}
+@keyframes tdot { 0%,80%,100%{opacity:0.2}40%{opacity:1} }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media (max-width:960px) {
+  .wings-grid { grid-template-columns:1fr; }
+  .form-row-4 { grid-template-columns:1fr 1fr; }
+  .seo-meta-grid { grid-template-columns:1fr 1fr; }
+  .studio-wrap { grid-template-columns:1fr; }
+}
+@media (max-width:640px) {
+  .sidebar { position:fixed;left:0;top:var(--nav-h);height:calc(100vh - var(--nav-h));transform:translateX(-100%);z-index:850; }
+  .sidebar.open { transform:translateX(0); }
+  .main-wrap { margin-left:0; }
+  .mob-btn { display:flex; }
+  .nav-center { display:none; }
+  .nav-prog-wrap { display:none; }
+  .screen { padding:24px 18px; }
+  .wings-grid { grid-template-columns:1fr;gap:12px; }
+  .tool-grid { grid-template-columns:repeat(2,1fr); }
+  .form-row-2,.form-row-4 { grid-template-columns:1fr; }
+  .quiz-controls { grid-template-columns:1fr; }
+  .hero-title { font-size:32px; letter-spacing:-1px; }
+  .hero { padding:36px 0 28px; }
+  .idea-choice-grid { grid-template-columns:1fr; }
+  .progress-strip { padding:10px 18px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay hidden" id="authModal">
+  <div class="modal-box" style="max-width:420px">
+    <div class="modal-title" id="authTitle">Welcome to <em style="color:var(--violet);font-style:italic">Prodigy</em></div>
+    <p class="modal-sub" id="authSub">Sign in to save your work across all devices.</p>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:4px;background:var(--cream-2);border-radius:30px;padding:4px;margin-bottom:24px">
+      <button id="tabSignin" onclick="switchAuthTab('signin')" style="flex:1;padding:8px;border-radius:24px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;background:var(--white);color:var(--ink);box-shadow:var(--shadow-sm)">Sign In</button>
+      <button id="tabSignup" onclick="switchAuthTab('signup')" style="flex:1;padding:8px;border-radius:24px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;background:none;color:var(--ink-3)">Sign Up</button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-input" id="authEmail" placeholder="your@email.com" onkeydown="if(event.key==='Enter')handleAuth()">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" class="form-input" id="authPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')handleAuth()">
+    </div>
+    <div id="authError" style="margin-bottom:12px"></div>
+    <button class="btn btn-primary" style="width:100%;border-radius:var(--r-sm)" onclick="handleAuth()" id="authBtn">Sign In</button>
+    <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--ink-4)">
+      Your data is private and encrypted. No spam, ever.
+    </div>
+  </div>
+</div>
+
+<!-- USER BAR (shows when logged in) -->
+<div id="userBar" class="hidden" style="position:fixed;bottom:20px;right:20px;z-index:800;background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-md)">
+  <div style="width:28px;height:28px;border-radius:50%;background:var(--violet);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:700" id="userAvatar">U</div>
+  <div>
+    <div style="font-size:12px;font-weight:700;color:var(--ink)" id="userEmail">user@email.com</div>
+    <div style="font-size:10px;color:var(--ink-4)" id="saveStatus">All changes saved ✓</div>
+  </div>
+  <button onclick="signOut()" style="background:none;border:none;color:var(--ink-4);font-size:11px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all 0.2s" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--ink-4)'">Sign out</button>
+</div>
+
+<!-- PROJECT SWITCHER -->
+<div id="projectBar" class="hidden" style="position:fixed;bottom:20px;left:calc(var(--sb-w) + 20px);z-index:800;background:var(--white);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-md)">
+  <span style="font-size:12px;color:var(--ink-3);font-weight:500">Project:</span>
+  <select id="projectSelect" onchange="switchProject(this.value)" style="border:none;background:none;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;outline:none;max-width:180px"></select>
+  <button onclick="newProject()" style="background:var(--violet-soft);border:1px solid var(--violet-b);color:var(--violet);font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;cursor:pointer">+ New</button>
+</div>
+
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+
+<!-- EXPORT MODAL -->
+<div class="modal-overlay hidden" id="exportModal">
+  <div class="modal-box">
+    <div class="modal-title">Export Your <em style="color:var(--violet);font-style:italic">Product Kit</em></div>
+    <p class="modal-sub">Select completed modules to download as a printable PDF.</p>
+    <div id="exportList"></div>
+    <div class="btn-row" style="margin-top:24px">
+      <button class="btn btn-primary" onclick="doExport()">⬇ Download PDF</button>
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ NAVBAR ═══════════ -->
+<nav class="navbar">
+  <button class="mob-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+
+  <a class="nav-logo" onclick="goHome()">
+    <div class="nav-logo-mark">P</div>
+    <div class="nav-logo-name">Prodigy<span>.</span></div>
+  </a>
+
+  <div class="nav-center">
+    <div class="nav-tabs">
+      <button class="nav-tab active" id="tab-all"       onclick="setTab('all')">All Tools</button>
+      <button class="nav-tab"        id="tab-studio"    onclick="setTab('studio')">Digital Studio</button>
+      <button class="nav-tab"        id="tab-marketing" onclick="setTab('marketing')">Marketing Engine</button>
+    </div>
+  </div>
+
+  <div class="nav-right">
+    <div class="nav-prog-wrap">
+      <span class="nav-prog-txt" id="navProgTxt">0 / 21</span>
+      <div class="nav-prog-bar"><div class="nav-prog-fill" id="navProgFill" style="width:0%"></div></div>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="openModal()">Export</button>
+    <button class="btn btn-violet btn-sm" onclick="openAuthModal()" id="authNavBtn">Sign In</button>
+  </div>
+</nav>
+
+<!-- ═══════════ APP ═══════════ -->
+<div class="app-layout">
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<aside class="sidebar" id="sidebar">
+
+  <div class="sb-profile" onclick="goTo('profile')">
+    <div class="sb-p-name" id="sbName">Set up your profile →</div>
+    <div class="sb-p-sub"  id="sbSub">Personalises every tool</div>
+    <div class="sb-p-bar"><div class="sb-p-fill" id="sbFill" style="width:0%"></div></div>
+  </div>
+
+  <!-- Start Here -->
+  <div class="sb-section">
+    <div class="sb-section-label">Start Here <span class="sb-badge violet">FREE</span></div>
+    <div class="sb-item active" id="nav-home"     onclick="goHome()">     <span class="sb-icon">🏠</span> Home</div>
+    <div class="sb-item"        id="nav-profile"  onclick="goTo('profile')"><span class="sb-icon">👤</span> Your Profile   <span class="sb-check hidden" id="chk-profile">✓</span></div>
+    <div class="sb-item"        id="nav-validate" onclick="goTo('validate')"><span class="sb-icon">🧠</span> Idea Validator <span class="sb-check hidden" id="chk-validate">✓</span></div>
+    <div class="sb-item"        id="nav-images"   onclick="goTo('images')"><span class="sb-icon">🖼️</span> Image Library</div>
+    <div class="sb-item"        id="nav-imagegen" onclick="goTo('imagegen')"><span class="sb-icon">🤖</span> AI Image Studio <span class="sb-new">NEW</span></div>
+  </div>
+  <div class="sb-divider"></div>
+
+  <!-- Digital Studio -->
+  <div class="sb-section">
+    <div class="sb-section-label">Digital Studio <span class="sb-badge violet">BUILD</span></div>
+    <div class="sb-item" id="nav-uvz"       onclick="navAndGen('uvz')">      <span class="sb-icon">🎯</span> UVZ Analysis    <span class="sb-check hidden" id="chk-uvz">✓</span></div>
+    <div class="sb-item" id="nav-names"     onclick="navAndGen('names')">    <span class="sb-icon">✍️</span> Product Names   <span class="sb-check hidden" id="chk-names">✓</span></div>
+    <div class="sb-item" id="nav-charter"   onclick="navAndGen('charter')">  <span class="sb-icon">📋</span> Product Charter <span class="sb-check hidden" id="chk-charter">✓</span></div>
+    <div class="sb-item" id="nav-templates" onclick="navAndGen('templates')"><span class="sb-icon">📊</span> Templates       <span class="sb-check hidden" id="chk-templates">✓</span></div>
+    <div class="sb-item" id="nav-pricing"   onclick="navAndGen('pricing')">  <span class="sb-icon">💎</span> Pricing Strategy<span class="sb-check hidden" id="chk-pricing">✓</span></div>
+    <div class="sb-item" id="nav-listing"   onclick="goTo('listing')">       <span class="sb-icon">🛍️</span> Marketplace Listing<span class="sb-check hidden" id="chk-listing">✓</span></div>
+    <div class="sb-item" id="nav-welcome"   onclick="navAndGen('welcome')">  <span class="sb-icon">🎓</span> Welcome Page    <span class="sb-check hidden" id="chk-welcome">✓</span></div>
+    <div class="sb-item" id="nav-quiz"      onclick="goTo('quiz')">          <span class="sb-icon">📝</span> Quiz Builder    <span class="sb-check hidden" id="chk-quiz">✓</span></div>
+  </div>
+  <div class="sb-divider"></div>
+
+  <!-- GhostWriter -->
+  <div class="sb-section">
+    <div class="sb-section-label">GhostWriter OS <span class="sb-badge rose">COPY</span></div>
+    <div class="sb-item rose" id="nav-salespage" onclick="navAndGen('salespage')"><span class="sb-icon">💰</span> Sales Page     <span class="sb-check hidden" id="chk-salespage">✓</span></div>
+    <div class="sb-item rose" id="nav-emails"    onclick="navAndGen('emails')">   <span class="sb-icon">📧</span> Email Sequence <span class="sb-check hidden" id="chk-emails">✓</span></div>
+    <div class="sb-item rose" id="nav-hooks"     onclick="navAndGen('hooks')">    <span class="sb-icon">🪝</span> Hooks & Ads    <span class="sb-check hidden" id="chk-hooks">✓</span></div>
+    <div class="sb-item rose" id="nav-script"    onclick="navAndGen('script')">   <span class="sb-icon">🎬</span> Video Script   <span class="sb-check hidden" id="chk-script">✓</span></div>
+    <div class="sb-item rose" id="nav-brand"     onclick="navAndGen('brand')">    <span class="sb-icon">🎨</span> Brand Voice    <span class="sb-check hidden" id="chk-brand">✓</span></div>
+  </div>
+  <div class="sb-divider"></div>
+
+  <!-- Marketing Engine -->
+  <div class="sb-section">
+    <div class="sb-section-label">Marketing Engine <span class="sb-badge sage">GROW</span></div>
+    <div class="sb-item sage" id="nav-marketing"  onclick="goTo('marketing')">     <span class="sb-icon">📣</span> Platform Content  <span class="sb-check hidden" id="chk-marketing">✓</span></div>
+    <div class="sb-item sage" id="nav-seo"        onclick="navAndGen('seo')">       <span class="sb-icon">🔍</span> SEO Blog Post     <span class="sb-check hidden" id="chk-seo">✓</span></div>
+    <div class="sb-item sage" id="nav-calendar"   onclick="navAndGen('calendar')">  <span class="sb-icon">📅</span> Content Calendar  <span class="sb-check hidden" id="chk-calendar">✓</span></div>
+    <div class="sb-item sage" id="nav-funnel"     onclick="navAndGen('funnel')">    <span class="sb-icon">🔁</span> Full Funnel       <span class="sb-check hidden" id="chk-funnel">✓</span></div>
+    <div class="sb-item sage" id="nav-onboarding" onclick="navAndGen('onboarding')"><span class="sb-icon">🚀</span> Onboarding Flow   <span class="sb-check hidden" id="chk-onboarding">✓</span></div>
+    <div class="sb-item sage" id="nav-affiliate"  onclick="navAndGen('affiliate')"> <span class="sb-icon">🤝</span> Affiliate System  <span class="sb-check hidden" id="chk-affiliate">✓</span></div>
+    <div class="sb-item sage" id="nav-automation" onclick="navAndGen('automation')"><span class="sb-icon">⚡</span> Automation Guide  <span class="sb-check hidden" id="chk-automation">✓</span></div>
+  </div>
+  <div class="sb-divider"></div>
+
+  <!-- Business OS -->
+  <div class="sb-section">
+    <div class="sb-section-label">Business OS <span class="sb-badge violet">SCALE</span></div>
+    <div class="sb-item" id="nav-legal" onclick="navAndGen('legal')"><span class="sb-icon">⚖️</span> Legal Templates <span class="sb-check hidden" id="chk-legal">✓</span></div>
+    <div class="sb-item" id="nav-kpis"  onclick="navAndGen('kpis')"> <span class="sb-icon">📈</span> KPIs & Revenue  <span class="sb-check hidden" id="chk-kpis">✓</span></div>
+    <div class="sb-item" id="nav-coach" onclick="goTo('coach')">     <span class="sb-icon">🧠</span> AI Coach        <span class="sb-new">LIVE</span></div>
+  </div>
+
+  <div style="height:28px"></div>
+</aside>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<main class="main-wrap">
+
+  <!-- Progress strip -->
+  <div class="progress-strip">
+    <span class="ps-label" id="psLabel">0 of 21 complete</span>
+    <div class="ps-track"><div class="ps-fill" id="psFill" style="width:0%"></div></div>
+    <div class="ps-right">
+      <button class="btn btn-outline btn-xs" onclick="goTo('profile')">👤 Profile</button>
+      <button class="btn btn-violet btn-xs" onclick="goTo('coach')">🧠 Coach</button>
+    </div>
+  </div>
+
+  <!-- ══ HOME ══ -->
+  <div class="screen active" id="screen-home">
+    <div class="hero">
+      <div class="hero-eyebrow">AI-Powered Digital Product Suite</div>
+      <h1 class="hero-title">Build products like you've<br>done it for <em>40 years.</em></h1>
+      <p class="hero-sub">One idea. One tool. A complete digital product — validated, built, priced, listed, and marketed. No expertise needed.</p>
+      <div class="hero-search-bar">
+        <input type="text" id="searchInput" placeholder="Search tools… sales page, email, quiz, funnel, hooks…" oninput="filterTools(this.value)">
+        <button class="btn btn-primary btn-sm" onclick="goTo('validate')">Start Building →</button>
+      </div>
+    </div>
+
+    <p class="section-eyebrow">What do you want to do today?</p>
+    <div class="wings-grid" id="wingsGrid"></div>
+
+    <div class="tg-eyebrow" id="tgLabel">All 25 tools — click any to open instantly</div>
+    <div class="tool-grid" id="toolGrid"></div>
+  </div>
+
+  <!-- ══ IDEA VALIDATOR ══ -->
+  <div class="screen" id="screen-validate">
+    <div class="sec-head">
+      <div class="sec-eyebrow">Start Here</div>
+      <h1 class="sec-title">What's your <em>idea?</em></h1>
+      <p class="sec-desc">Have an idea? Tell your mentor — they'll give you an honest verdict. No idea? Browse 100+ trending digital product categories.</p>
+    </div>
+
+    <!-- Choice -->
+    <div id="validateChoiceCard" class="card">
+      <div class="idea-choice-grid">
+        <div class="idea-choice" onclick="showIdeaInput()">
+          <span class="idea-choice-icon">💡</span>
+          <div class="idea-choice-title">I have an idea</div>
+          <div class="idea-choice-desc">Tell your mentor. They'll validate it, flag risks, and tell you honestly whether it's worth building.</div>
+        </div>
+        <div class="idea-choice" onclick="showIdeaBrowser()">
+          <span class="idea-choice-icon">🗂️</span>
+          <div class="idea-choice-title">I need inspiration</div>
+          <div class="idea-choice-desc">Browse 100+ trending digital product ideas by category. Pick one and your mentor validates it instantly.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Idea Input -->
+    <div class="card hidden" id="ideaInputCard">
+      <div class="card-title">Tell your mentor your idea</div>
+      <div class="card-desc">Two fields. 30 seconds. Then your mentor gives you a real assessment.</div>
+      <div class="form-group">
+        <label class="form-label">Your Idea</label>
+        <textarea class="form-textarea" id="ideaText" rows="3" placeholder="e.g. I want to teach people how to do woodworking at home and build furniture from scratch…"></textarea>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Who is it for?</label>
+        <input type="text" class="form-input" id="ideaAudience" placeholder="e.g. Complete beginners who want to build furniture but have never touched a tool…">
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-violet" onclick="startMentorChat()">✦ Talk to Your Mentor</button>
+        <button class="btn btn-outline" onclick="resetValidate()">← Back</button>
+      </div>
+    </div>
+
+    <!-- Idea Browser -->
+    <div class="card hidden" id="ideaBrowserCard">
+      <div class="card-title">Browse by Category</div>
+      <div class="card-desc">Pick a category to see trending ideas. Select one to validate with your mentor.</div>
+      <div class="idea-cat-grid" id="ideaCatGrid"></div>
+      <div id="ideaOptsWrap" class="hidden">
+        <div class="divider"></div>
+        <div class="card-title" id="ideaCatTitle" style="margin-bottom:12px">Trending Ideas</div>
+        <div class="idea-opt-list" id="ideaOptList"></div>
+        <div class="btn-row">
+          <button class="btn btn-violet" id="validateBrowserBtn" onclick="validateBrowserIdea()" disabled>✦ Validate This Idea</button>
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn btn-outline" onclick="resetValidate()">← Back</button>
+      </div>
+    </div>
+
+    <!-- Format Picker -->
+    <div class="card hidden" id="formatCard">
+      <div class="card-title">What format should this product be?</div>
+      <div class="card-desc">Your mentor will suggest the best fit. Or choose yourself below.</div>
+      <div class="format-grid" id="formatGrid"></div>
+      <div class="btn-row">
+        <button class="btn btn-violet" onclick="confirmFormat()">Continue with this format →</button>
+      </div>
+    </div>
+
+    <!-- Mentor Chat -->
+    <div class="hidden" id="mentorChatWrap">
+      <div class="mentor-win">
+        <div class="mentor-header">
+          <div class="mentor-av">✦</div>
+          <div class="mentor-name-wrap">
+            <div class="mentor-name">Your Business Mentor</div>
+            <div class="mentor-sub">40 years of digital product experience</div>
+          </div>
+          <div class="mentor-online">Online now</div>
+        </div>
+        <div class="mentor-msgs" id="mentorMsgs">
+          <div class="mmsg mentor">
+            <div class="mmsg-av">✦</div>
+            <div class="mmsg-bub">Hey — I've seen thousands of digital products succeed and fail. Share your idea and I'll give you an honest read: what works, what worries me, and whether I'd put money behind it. No sugarcoating.</div>
+          </div>
+        </div>
+        <div class="mentor-foot">
+          <input type="text" id="mentorInput" placeholder="Respond or ask your mentor anything…" onkeydown="if(event.key==='Enter')sendMentor()">
+          <button class="btn btn-primary btn-sm" onclick="sendMentor()">Send</button>
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn btn-violet" onclick="proceedToFormat()">Idea is good → Choose Format</button>
+        <button class="btn btn-outline" onclick="resetValidate()">Start over</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PROFILE ══ -->
+  <div class="screen" id="screen-profile">
+    <div class="sec-head">
+      <div class="sec-eyebrow">Foundation</div>
+      <h1 class="sec-title">Your <em>Creator Profile</em></h1>
+      <p class="sec-desc">Fill this once and every tool generates personalised output — not generic AI responses.</p>
+    </div>
+    <div class="standalone-chip">⚡ Every tool works standalone — profile just makes output 10× better</div>
+    <div class="restore-banner hidden" id="restoreBanner">
+      <div class="rb-label">↩ Saved profile found</div>
+      <div id="restoreText" style="font-size:12px;color:var(--ink-3);margin-bottom:10px"></div>
+      <div class="btn-row" style="margin-top:0">
+        <button class="btn btn-sage btn-sm" onclick="doRestore()">Restore Profile</button>
+        <button class="btn btn-outline btn-sm" onclick="clearData()">Clear</button>
+      </div>
+    </div>
+    <div class="mvp-banner">
+      <div class="mvp-icon">⚡</div>
+      <div class="mvp-text">
+        <strong>MVP Mode — Launch in 3 minutes</strong>
+        <span>Generates UVZ + Product Charter + Sales Page instantly. Start fast.</span>
+      </div>
+      <div class="mvp-cta"><button class="btn btn-violet btn-sm" onclick="if(getProfile(true))runMVP()">⚡ Go</button></div>
+    </div>
+    <div class="card">
+      <div class="form-group">
+        <label class="form-label">Your Skills, Expertise & Knowledge</label>
+        <textarea class="form-textarea" id="skills" rows="4" placeholder="e.g. I've been a personal fitness coach for 7 years, specialising in busy professionals. I know nutrition science, habit building, progressive overload, and accountability systems. I've helped 300+ clients lose weight sustainably without crash diets…"></textarea>
+        <p class="form-hint">Be specific — years of experience, tools, results you've achieved</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Target Audience & Their Struggles</label>
+        <textarea class="form-textarea" id="audience" rows="4" placeholder="e.g. Busy professionals aged 30–45 who want to lose weight but can't stick to diets. They've tried everything. They say 'I'll start Monday' and feel guilty after every meal…"></textarea>
+        <p class="form-hint">Their exact fears, language, desires, and frustrations</p>
+      </div>
+      <div class="form-row-4">
+        <div class="form-group">
+          <label class="form-label">Product Type</label>
+          <select class="form-select" id="productType">
+            <option value="">— AI decides —</option>
+            <option>Online Course</option><option>Ebook / PDF Guide</option>
+            <option>Coaching Programme</option><option>Template Pack</option>
+            <option>Membership / Community</option><option>Workshop / Bootcamp</option>
+            <option>Done-For-You Service</option><option>Printable / Planner</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Price Range</label>
+          <select class="form-select" id="priceRange">
+            <option value="">— AI suggests —</option>
+            <option>Low-ticket ($7–$47)</option>
+            <option>Mid-low ($47–$97)</option>
+            <option>Mid ($197–$497)</option>
+            <option>High-ticket ($997–$2,997)</option>
+            <option>Premium ($3,000+)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Main Platform</label>
+          <select class="form-select" id="platform">
+            <option value="">— Select —</option>
+            <option>TikTok</option><option>Instagram</option><option>YouTube</option>
+            <option>Pinterest</option><option>Twitter / X</option>
+            <option>LinkedIn</option><option>Facebook</option>
+            <option>Email List</option><option>No audience yet</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Audience Size</label>
+          <select class="form-select" id="audienceSize">
+            <option value="">— Select —</option>
+            <option>Starting from 0</option><option>Under 1,000</option>
+            <option>1,000 – 10,000</option><option>10,000 – 100,000</option>
+            <option>100,000+</option>
+          </select>
+        </div>
+      </div>
+      <div id="profileError"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="runAll()">✦ Generate All Modules</button>
+        <button class="btn btn-violet"  onclick="if(getProfile(true))runMVP()">⚡ MVP Mode</button>
+        <button class="btn btn-outline" onclick="if(getProfile(true)){goTo('uvz');runGen('uvz')}">Step by Step →</button>
+      </div>
+      <p style="font-size:11px;color:var(--ink-4);margin-top:12px">Profile auto-saves locally. Your work is never lost.</p>
+    </div>
+  </div>
+
+  <!-- ══ MARKETING ENGINE ══ -->
+  <div class="screen" id="screen-marketing">
+    <div class="sec-head">
+      <div class="sec-eyebrow sage">Marketing Engine</div>
+      <h1 class="sec-title">Platform <em>Content Generator</em></h1>
+      <p class="sec-desc">Pick your platforms. Get copy-paste ready content — hooks, captions, hashtags, and scripts specific to each one.</p>
+    </div>
+    <div class="standalone-chip">✓ Works standalone — just describe what you're selling</div>
+    <div class="card">
+      <div class="form-group">
+        <label class="form-label">What are you selling? <span style="color:var(--ink-4);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px">(optional if profile exists)</span></label>
+        <textarea class="form-textarea" id="mktProduct" rows="2" placeholder="e.g. A woodworking course for beginners. Price: $197. Main promise: build your first piece in 30 days…"></textarea>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Choose your platforms</label>
+        <div class="platform-grid" id="platformGrid"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-sage" onclick="genMarketing()">📣 Generate Content</button>
+        <button class="btn btn-outline" onclick="rerun('marketing')">↺ Redo</button>
+      </div>
+    </div>
+    <div class="card">
+      <div id="marketingLoading" class="loading-state hidden">
+        <div class="spinner" style="border-top-color:var(--sage)"></div>
+        <p class="loading-label" style="color:var(--sage)">Creating Content</p>
+        <span class="loading-sub">Building platform-specific posts</span>
+      </div>
+      <div id="marketingOutput" class="hidden"></div>
+      <div id="marketingError"></div>
+      <div class="btn-row hidden" id="marketingBtns">
+        <button class="btn btn-outline" onclick="copyOutput('marketing')">Copy All</button>
+        <button class="btn btn-outline" onclick="openModal()">📄 Export</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MARKETPLACE LISTING ══ -->
+  <div class="screen" id="screen-listing">
+    <div class="sec-head">
+      <div class="sec-eyebrow">Digital Studio</div>
+      <h1 class="sec-title">Marketplace <em>Listing</em></h1>
+      <p class="sec-desc">A profit-optimised product listing for your chosen marketplace — written to attract buyers on autopilot.</p>
+    </div>
+    <div class="standalone-chip">✓ Works standalone — just describe your product</div>
+    <div class="card">
+      <div class="form-group">
+        <label class="form-label">Where are you selling?</label>
+        <div class="market-grid" id="marketGrid"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Product description <span style="color:var(--ink-4);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px">(optional if profile exists)</span></label>
+        <textarea class="form-textarea" id="listingCtx" rows="2" placeholder="e.g. A fitness planner template pack for busy mums. 12 Canva templates. Price: $27…"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="genListing()">🛍️ Generate Listing</button>
+        <button class="btn btn-outline" onclick="rerun('listing')">↺ Redo</button>
+      </div>
+    </div>
+    <div class="card">
+      <div id="listingLoading" class="loading-state hidden"><div class="spinner"></div><p class="loading-label">Writing Listing</p><span class="loading-sub">Optimising for search & conversion</span></div>
+      <div id="listingOutput" class="hidden"></div>
+      <div id="listingError"></div>
+      <div class="btn-row hidden" id="listingBtns">
+        <button class="btn btn-primary" onclick="nextStep('listing','salespage')">Sales Page →</button>
+        <button class="btn btn-outline" onclick="copyOutput('listing')">Copy</button>
+        <button class="btn btn-outline" onclick="editOutput('listing')" id="editBtn-listing">✏ Edit</button>
+        <button class="btn btn-outline" onclick="rerun('listing')">↺ Redo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ IMAGE LIBRARY ══ -->
+  <div class="screen" id="screen-images">
+    <div class="sec-head"><div class="sec-eyebrow">Foundation</div><h1 class="sec-title">Product <em>Image Library</em></h1><p class="sec-desc">Search royalty-free Unsplash images for your course, ebook cover, or marketing.</p></div>
+    <div class="standalone-chip">✓ No profile needed</div>
+    <div class="card">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+        <input type="text" class="form-input" id="imgQ" style="flex:1;min-width:180px" placeholder="Search… woodworking, fitness, laptop, desk setup…" onkeydown="if(event.key==='Enter')doImgSearch()">
+        <button class="btn btn-primary" onclick="doImgSearch()">Search</button>
+        <button class="btn btn-outline btn-sm" onclick="autoImgSearch()">Auto from Profile</button>
+      </div>
+      <div id="imgError"></div>
+      <div id="imgGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:10px;margin-top:14px"></div>
+      <div id="imgSelSection" class="hidden" style="margin-top:20px">
+        <div class="divider"></div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--ink)">Selected (<span id="imgSelCount">0</span>)</div>
+        <div id="imgSelWrap" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+        <div class="btn-row">
+          <button class="btn btn-sage btn-sm" onclick="markDone('images');toast('Library saved ✓','success')">✓ Save Library</button>
+          <button class="btn btn-outline btn-sm" onclick="clearImgSel()">Clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ AI IMAGE STUDIO ══ -->
+  <div class="screen" id="screen-imagegen">
+    <div class="sec-head"><div class="sec-eyebrow">AI Studio</div><h1 class="sec-title">AI <em>Image Studio</em></h1><p class="sec-desc">Course covers, thumbnails, banners — AI-matched from Unsplash in seconds.</p></div>
+    <div class="standalone-chip">✓ Describe anything — no profile needed</div>
+    <div class="studio-wrap">
+      <div>
+        <div class="card">
+          <div class="form-group"><label class="form-label">Describe Your Image</label><textarea class="form-textarea" id="imgPrompt" rows="3" placeholder="e.g. Premium course cover for a fitness programme — clean, professional, warm tones…"></textarea></div>
+          <div class="form-group">
+            <label class="form-label">Style Preset</label>
+            <div class="style-chip-grid" id="styleChipGrid">
+              <div class="style-chip active" onclick="pickStyle(this,'Course Cover')">📚 Course</div>
+              <div class="style-chip" onclick="pickStyle(this,'Ebook Cover')">📖 Ebook</div>
+              <div class="style-chip" onclick="pickStyle(this,'Social Banner')">📱 Banner</div>
+              <div class="style-chip" onclick="pickStyle(this,'YouTube Thumbnail')">▶️ Thumb</div>
+              <div class="style-chip" onclick="pickStyle(this,'Ad Creative')">💰 Ad</div>
+              <div class="style-chip" onclick="pickStyle(this,'Printable')">🖨️ Print</div>
+              <div class="style-chip" onclick="pickStyle(this,'Logo / Icon')">✦ Logo</div>
+              <div class="style-chip" onclick="pickStyle(this,'Infographic')">📊 Info</div>
+              <div class="style-chip" onclick="pickStyle(this,'Custom')">✏️ Custom</div>
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group" style="margin:0"><label class="form-label">Ratio</label><select class="form-select" id="imgRatio"><option value="square">Square (1:1)</option><option value="landscape">Landscape (16:9)</option><option value="portrait">Portrait (2:3)</option></select></div>
+            <div class="form-group" style="margin:0"><label class="form-label">Mood</label><select class="form-select" id="imgMood"><option value="warm minimal">Warm & Minimal</option><option value="dark premium">Dark & Premium</option><option value="light airy">Light & Airy</option><option value="bold vibrant">Bold & Vibrant</option></select></div>
+          </div>
+          <div class="btn-row" style="margin-top:18px">
+            <button class="btn btn-primary" onclick="runAIImage()">Generate Images</button>
+            <button class="btn btn-outline btn-sm" onclick="autoImgPrompt()">✦ Auto Prompt</button>
+          </div>
+          <div id="imgGenError"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">Output</div>
+        <div id="imgGenLoading" class="hidden" style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:40px">
+          <div class="spinner" style="border-top-color:var(--violet)"></div>
+          <p class="loading-label">Generating...</p>
+        </div>
+        <div id="imgGenResult">
+          <div class="img-gen-grid">
+            <div class="img-slot"><div class="img-placeholder"><span>🖼️</span><p>Variation 1</p></div></div>
+            <div class="img-slot"><div class="img-placeholder"><span>🖼️</span><p>Variation 2</p></div></div>
+            <div class="img-slot"><div class="img-placeholder"><span>🖼️</span><p>Variation 3</p></div></div>
+            <div class="img-slot"><div class="img-placeholder"><span>🖼️</span><p>Variation 4</p></div></div>
+          </div>
+        </div>
+        <div id="savedImgCard" class="hidden" style="margin-top:16px">
+          <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--ink)">Saved (<span id="savedImgCount">0</span>)</div>
+          <div id="savedImgsRow" class="saved-imgs-row"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODULE SCREENS (generated via JS template) ══ -->
+  <!-- UVZ -->
+  <div class="screen" id="screen-uvz"><div class="sec-head"><div class="sec-eyebrow">Digital Studio</div><h1 class="sec-title">Unique <em>Value Zone</em></h1><p class="sec-desc">The intersection of your expertise and your audience's deepest pain. Your unfair advantage.</p></div><div class="standalone-chip">✓ Works standalone</div><div class="card"><div id="uvzLoading" class="loading-state"><div class="spinner"></div><p class="loading-label">Analysing Value Zone</p><span class="loading-sub">Mapping skills × audience pain</span></div><div id="uvzOutput" class="output hidden"></div><div id="uvzError"></div><div class="btn-row hidden" id="uvzBtns"><button class="btn btn-primary" onclick="nextStep('uvz','names')">Names →</button><button class="btn btn-outline" onclick="copyOutput('uvz')">Copy</button><button class="btn btn-outline" onclick="editOutput('uvz')" id="editBtn-uvz">✏ Edit</button><button class="btn btn-outline" onclick="rerun('uvz')">↺ Redo</button></div></div></div>
+
+  <!-- NAMES -->
+  <div class="screen" id="screen-names"><div class="sec-head"><div class="sec-eyebrow">Digital Studio</div><h1 class="sec-title">Product <em>Name Generator</em></h1><p class="sec-desc">10 brandable names with taglines, domain ideas, and positioning rationale.</p></div><div class="card"><div id="namesLoading" class="loading-state"><div class="spinner"></div><p class="loading-label">Crafting Names</p><span class="loading-sub">Generating brandable options</span></div><div id="namesOutput" class="hidden"></div><div id="namesError"></div><div class="btn-row hidden" id="namesBtns"><button class="btn btn-primary" onclick="nextStep('names','charter')">Charter →</button><button class="btn btn-outline" onclick="copyOutput('names')">Copy</button><button class="btn btn-outline" onclick="rerun('names')">↺ Redo</button></div></div></div>
+
+  <!-- CHARTER -->
+  <div class="screen" id="screen-charter"><div class="sec-head"><div class="sec-eyebrow">Digital Studio</div><h1 class="sec-title">Product <em>Charter</em></h1><p class="sec-desc">Full blueprint — curriculum, modules, transformation promise, and architecture.</p></div><div class="card"><div id="charterLoading" class="loading-state"><div class="spinner"></div><p class="loading-label">Building Charter</p><span class="loading-sub">Designing full product architecture</span></div><div id="charterOutput" class="hidden"></div><div id="charterError"></div><div class="btn-row hidden" id="charterBtns"><button class="btn btn-primary" onclick="nextStep('charter','templates')">Templates →</button><button class="btn btn-outline" onclick="copyOutput('charter')">Copy</button><button class="btn btn-outline" onclick="editOutput('charter')" id="editBtn-charter">✏ Edit</button><button class="btn btn-outline" onclick="rerun('charter')">↺ Redo</button><button class="btn btn-outline" onclick="openModal()">📄</button></div></div></div>
+
+  <!-- TEMPLATES -->
+  <div class="screen" id="screen-templates"><div class="sec-head"><div class="sec-eyebrow">Digital Studio</div><h1 class="sec-title">Templates <em>& Tools</em></h1><p class="sec-desc">Ready-made worksheets, checklists, and resource guides for inside your product.</p></div><div class="card"><div id="templatesLoading" class="loading-state"><div class="spinner"></div><p class="loading-label">Building Templates</p><span class="loading-sub">Creating product-specific worksheets</span></div><div id="templatesOutput" class="hidden"></div><div id="templatesError"></div><div class="btn-row hidden" id="templatesBtns"><button class="btn btn-primary" onclick="nextStep('templates','pricing')">Pricing →</button><button class="btn btn-outline" onclick="copyOutput('templates')">Copy</button><button class="btn btn-outline" onclick="rerun('templates')">↺ Redo</button></div></div></div>
+
+  <!-- PRICING -->
+  <div class="screen" id="screen-pricing"><div class="sec-head"><div class="sec-eyebrow">Digital Studio</div><h1 class="sec-title">Pricing <em>Strategy</em></h1><p class="sec-desc">Price points, payment plans, anchor pricing, guarantee copy, revenue projections.</p></div><div class="card"><div id="pricingLoading" class="loading-state"><div class="spinner"></div><p class="loading-label">Calculating Pricing</p><span class="loading-sub">Applying price psychology frameworks</span></div><div id="pricingOutput" class="output hidden"></div><div id="pricingError"></div><div class="btn-row hidden" id="pricingBtns"><button class="btn btn-primary" onclick="nextStep('pricing','listing')">Listing →</button><button class="btn btn-outline" onclick="copyOutput('pricing')">Copy</button><button class="btn btn-outline" onclick="rerun('pricing')">↺ Redo</button></div></div></div>
+
+  <!-- WELCOME -->
+  <div class="screen" id="screen-welcome"><div class="sec-head"><div class="sec-eyebrow">Digital Studio</div><h1 class="sec-title">Student <em>Welcome Page</em></h1><p class="sec-desc">The first page buyers see. Eliminates buyer's remorse instantly.</p></div><div class="card"><div id="welcomeLoading" class="loading-state"><div class="spinner"></div><p class="loading-label">Building Welcome Page</p><span class="loading-sub">Designing student onboarding</span></div><div id="welcomeOutput" class="hidden"></div><div id="welcomeError"></div><div class="btn-row hidden" id="welcomeBtns"><button class="btn btn-primary" onclick="nextStep('welcome','salespage')">Sales Page →</button><button class="btn btn-outline" onclick="copyOutput('welcome')">Copy</button><button class="btn btn-outline" onclick="rerun('welcome')">↺ Redo</button></div></div></div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="screen-quiz"><div class="sec-head"><div class="sec-eyebrow">Digital Studio</div><h1 class="sec-title">Course <em>Quiz Generator</em></h1><p class="sec-desc">Knowledge checks for every module. Boosts completion rates by 3×.</p></div><div class="standalone-chip">✓ Works standalone — describe any topic</div><div class="card"><div class="quiz-controls"><div class="form-group" style="margin:0"><label class="form-label">Topic / Module</label><input type="text" class="form-input" id="quizTopic" placeholder="e.g. Module 3: Joinery (or leave blank)"></div><div class="form-group" style="margin:0"><label class="form-label">Questions</label><select class="form-select" id="quizCount"><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option></select></div><div class="form-group" style="margin:0"><label class="form-label">Type</label><select class="form-select" id="quizType"><option value="multiple choice">Multiple Choice</option><option value="true/false">True / False</option><option value="mixed">Mixed</option><option value="short answer">Short Answer</option></select></div><div class="form-group" style="margin:0"><label class="form-label">Difficulty</label><select class="form-select" id="quizDiff"><option value="beginner">Beginner</option><option value="intermediate" selected>Intermediate</option><option value="advanced">Advanced</option></select></div></div><div class="btn-row"><button class="btn btn-primary" onclick="runQuiz()">Generate Quiz</button><button class="btn btn-outline" onclick="copyOutput('quiz')">Copy</button></div><div id="quizLoading" class="loading-state hidden"><div class="spinner"></div><p class="loading-label">Building Quiz</p><span class="loading-sub">Creating questions & explanations</span></div><div id="quizOutput" class="hidden" style="margin-top:14px"></div><div id="quizError"></div></div></div>
+
+  <!-- SALES PAGE -->
+  <div class="screen" id="screen-salespage"><div class="sec-head"><div class="sec-eyebrow rose">GhostWriter OS</div><h1 class="sec-title">Sales Page <em>Copy</em></h1><p class="sec-desc">Full direct-response sales page — headline to close. 10 sections of conversion copy.</p></div><div class="standalone-chip">✓ Works standalone</div><div class="card"><textarea class="form-textarea" id="salespageCtx" rows="2" placeholder="Describe your product briefly (optional if profile exists)…"></textarea><div class="btn-row" style="margin-top:12px"><button class="btn btn-rose" onclick="runSalespageSolo()">💰 Generate Sales Page</button><button class="btn btn-outline" onclick="rerun('salespage')">↺ Redo</button></div></div><div class="card"><div id="salespageLoading" class="loading-state hidden"><div class="spinner" style="border-top-color:var(--rose)"></div><p class="loading-label" style="color:var(--rose)">Writing Sales Page</p><span class="loading-sub">Applying direct-response frameworks</span></div><div id="salespageOutput" class="hidden"></div><div id="salespageError"></div><div class="btn-row hidden" id="salespageBtns"><button class="btn btn-primary" onclick="nextStep('salespage','emails')">Emails →</button><button class="btn btn-outline" onclick="copyOutput('salespage')">Copy All</button><button class="btn btn-outline" onclick="editOutput('salespage')" id="editBtn-salespage">✏ Edit</button></div></div></div>
+
+  <!-- EMAILS -->
+  <div class="screen" id="screen-emails"><div class="sec-head"><div class="sec-eyebrow rose">GhostWriter OS</div><h1 class="sec-title">Email <em>Sequence</em></h1><p class="sec-desc">5 full launch emails — story, problem, solution, proof, and close.</p></div><div class="card"><textarea class="form-textarea" id="emailsCtx" rows="2" placeholder="Describe your product (optional)…"></textarea><div class="btn-row" style="margin-top:12px"><button class="btn btn-rose" onclick="runEmailsSolo()">📧 Generate Emails</button><button class="btn btn-outline" onclick="rerun('emails')">↺ Redo</button></div></div><div class="card"><div id="emailsLoading" class="loading-state hidden"><div class="spinner" style="border-top-color:var(--rose)"></div><p class="loading-label" style="color:var(--rose)">Writing Emails</p><span class="loading-sub">Crafting 5-part launch sequence</span></div><div id="emailsOutput" class="hidden"></div><div id="emailsError"></div><div class="btn-row hidden" id="emailsBtns"><button class="btn btn-primary" onclick="nextStep('emails','hooks')">Hooks →</button><button class="btn btn-outline" onclick="copyOutput('emails')">Copy All</button><button class="btn btn-outline" onclick="editOutput('emails')" id="editBtn-emails">✏ Edit</button></div></div></div>
+
+  <!-- HOOKS -->
+  <div class="screen" id="screen-hooks"><div class="sec-head"><div class="sec-eyebrow rose">GhostWriter OS</div><h1 class="sec-title">Hooks, Angles <em>& Ads</em></h1><p class="sec-desc">TikTok hooks, Twitter threads, Facebook ads, YouTube titles, cold DMs.</p></div><div class="card"><textarea class="form-textarea" id="hooksCtx" rows="2" placeholder="Describe your niche (optional)…"></textarea><div class="btn-row" style="margin-top:12px"><button class="btn btn-rose" onclick="runHooksSolo()">🪝 Generate Hooks & Ads</button><button class="btn btn-outline" onclick="rerun('hooks')">↺ Redo</button></div></div><div class="card"><div id="hooksLoading" class="loading-state hidden"><div class="spinner" style="border-top-color:var(--rose)"></div><p class="loading-label" style="color:var(--rose)">Writing Hooks</p><span class="loading-sub">Generating platform-native copy</span></div><div id="hooksOutput" class="hidden"></div><div id="hooksError"></div><div class="btn-row hidden" id="hooksBtns"><button class="btn btn-primary" onclick="nextStep('hooks','script')">Script →</button><button class="btn btn-outline" onclick="copyOutput('hooks')">Copy All</button><button class="btn btn-outline" onclick="editOutput('hooks')" id="editBtn-hooks">✏ Edit</button></div></div></div>
+
+  <!-- SCRIPT -->
+  <div class="screen" id="screen-script"><div class="sec-head"><div class="sec-eyebrow rose">GhostWriter OS</div><h1 class="sec-title">Launch <em>Video Script</em></h1><p class="sec-desc">Full word-for-word script for your product launch video.</p></div><div class="card"><div id="scriptLoading" class="loading-state"><div class="spinner" style="border-top-color:var(--rose)"></div><p class="loading-label" style="color:var(--rose)">Writing Script</p><span class="loading-sub">Crafting word-for-word launch video</span></div><div id="scriptOutput" class="hidden"></div><div id="scriptError"></div><div class="btn-row hidden" id="scriptBtns"><button class="btn btn-primary" onclick="nextStep('script','brand')">Brand Voice →</button><button class="btn btn-outline" onclick="copyOutput('script')">Copy</button><button class="btn btn-outline" onclick="editOutput('script')" id="editBtn-script">✏ Edit</button><button class="btn btn-outline" onclick="rerun('script')">↺ Redo</button></div></div></div>
+
+  <!-- BRAND -->
+  <div class="screen" id="screen-brand"><div class="sec-head"><div class="sec-eyebrow rose">GhostWriter OS</div><h1 class="sec-title">Brand <em>Voice Guide</em></h1><p class="sec-desc">Tone, vocabulary, colour palette, fonts — your complete brand bible.</p></div><div class="card"><div id="brandLoading" class="loading-state"><div class="spinner" style="border-top-color:var(--rose)"></div><p class="loading-label" style="color:var(--rose)">Building Brand</p><span class="loading-sub">Defining personality & visual identity</span></div><div id="brandOutput" class="output hidden"></div><div id="brandError"></div><div class="btn-row hidden" id="brandBtns"><button class="btn btn-primary" onclick="nextStep('brand','funnel')">Funnel →</button><button class="btn btn-outline" onclick="copyOutput('brand')">Copy</button><button class="btn btn-outline" onclick="rerun('brand')">↺ Redo</button></div></div></div>
+
+  <!-- SEO -->
+  <div class="screen" id="screen-seo"><div class="sec-head"><div class="sec-eyebrow sage">Marketing Engine</div><h1 class="sec-title">SEO <em>Blog Post</em></h1><p class="sec-desc">A full Google-optimised article that drives free organic traffic to your product.</p></div><div class="standalone-chip">✓ Works standalone</div><div class="card"><textarea class="form-textarea" id="seoCtx" rows="2" placeholder="Describe your niche (optional)…"></textarea><div class="btn-row" style="margin-top:12px"><button class="btn btn-sage" onclick="runSEOSolo()">🔍 Write SEO Article</button><button class="btn btn-outline" onclick="rerun('seo')">↺ Redo</button></div></div><div class="card"><div id="seoLoading" class="loading-state hidden"><div class="spinner" style="border-top-color:var(--sage)"></div><p class="loading-label" style="color:var(--sage)">Writing Article</p><span class="loading-sub">Researching keywords & writing post</span></div><div id="seoOutput" class="hidden"></div><div id="seoError"></div><div class="btn-row hidden" id="seoBtns"><button class="btn btn-primary" onclick="nextStep('seo','calendar')">Calendar →</button><button class="btn btn-outline" onclick="copyOutput('seo')">Copy</button><button class="btn btn-outline" onclick="editOutput('seo')" id="editBtn-seo">✏ Edit</button></div></div></div>
+
+  <!-- CALENDAR -->
+  <div class="screen" id="screen-calendar"><div class="sec-head"><div class="sec-eyebrow sage">Marketing Engine</div><h1 class="sec-title">30-Day <em>Content Calendar</em></h1><p class="sec-desc">5 posts per week — hook, caption, hashtags. Built around your launch.</p></div><div class="card"><div id="calendarLoading" class="loading-state"><div class="spinner" style="border-top-color:var(--sage)"></div><p class="loading-label" style="color:var(--sage)">Building Calendar</p><span class="loading-sub">Planning 30 days of strategic content</span></div><div id="calendarOutput" class="hidden"></div><div id="calendarError"></div><div class="btn-row hidden" id="calendarBtns"><button class="btn btn-primary" onclick="nextStep('calendar','automation')">Automation →</button><button class="btn btn-outline" onclick="copyOutput('calendar')">Copy</button><button class="btn btn-outline" onclick="rerun('calendar')">↺ Redo</button></div></div></div>
+
+  <!-- FUNNEL -->
+  <div class="screen" id="screen-funnel"><div class="sec-head"><div class="sec-eyebrow sage">Marketing Engine</div><h1 class="sec-title">Complete <em>Sales Funnel</em></h1><p class="sec-desc">Lead magnet → core offer → upsell → 30-day launch plan. Fully mapped.</p></div><div class="card"><div id="funnelLoading" class="loading-state"><div class="spinner" style="border-top-color:var(--sage)"></div><p class="loading-label" style="color:var(--sage)">Building Funnel</p><span class="loading-sub">Mapping every touchpoint cold → close</span></div><div id="funnelOutput" class="hidden"></div><div id="funnelError"></div><div class="btn-row hidden" id="funnelBtns"><button class="btn btn-primary" onclick="nextStep('funnel','onboarding')">Onboarding →</button><button class="btn btn-outline" onclick="copyOutput('funnel')">Copy</button><button class="btn btn-outline" onclick="rerun('funnel')">↺ Redo</button></div></div></div>
+
+  <!-- ONBOARDING -->
+  <div class="screen" id="screen-onboarding"><div class="sec-head"><div class="sec-eyebrow sage">Marketing Engine</div><h1 class="sec-title">Buyer <em>Onboarding</em></h1><p class="sec-desc">Day 1, 3, 7, 14 post-purchase emails and a refund-prevention strategy.</p></div><div class="card"><div id="onboardingLoading" class="loading-state"><div class="spinner" style="border-top-color:var(--sage)"></div><p class="loading-label" style="color:var(--sage)">Designing Onboarding</p><span class="loading-sub">Mapping post-purchase buyer journey</span></div><div id="onboardingOutput" class="hidden"></div><div id="onboardingError"></div><div class="btn-row hidden" id="onboardingBtns"><button class="btn btn-primary" onclick="nextStep('onboarding','affiliate')">Affiliate →</button><button class="btn btn-outline" onclick="copyOutput('onboarding')">Copy All</button><button class="btn btn-outline" onclick="rerun('onboarding')">↺ Redo</button></div></div></div>
+
+  <!-- AFFILIATE -->
+  <div class="screen" id="screen-affiliate"><div class="sec-head"><div class="sec-eyebrow sage">Marketing Engine</div><h1 class="sec-title">Affiliate <em>Programme</em></h1><p class="sec-desc">Commission structure, swipe copy, and JV partner outreach templates.</p></div><div class="card"><div id="affiliateLoading" class="loading-state"><div class="spinner" style="border-top-color:var(--sage)"></div><p class="loading-label" style="color:var(--sage)">Building Affiliate System</p><span class="loading-sub">Designing partner programme</span></div><div id="affiliateOutput" class="hidden"></div><div id="affiliateError"></div><div class="btn-row hidden" id="affiliateBtns"><button class="btn btn-primary" onclick="nextStep('affiliate','legal')">Legal →</button><button class="btn btn-outline" onclick="copyOutput('affiliate')">Copy All</button><button class="btn btn-outline" onclick="rerun('affiliate')">↺ Redo</button></div></div></div>
+
+  <!-- AUTOMATION -->
+  <div class="screen" id="screen-automation"><div class="sec-head"><div class="sec-eyebrow sage">Marketing Engine</div><h1 class="sec-title">Launch <em>Automation Guide</em></h1><p class="sec-desc">Tech stack, Zapier flows, and full automation setup.</p></div><div class="card"><div id="automationLoading" class="loading-state"><div class="spinner" style="border-top-color:var(--sage)"></div><p class="loading-label" style="color:var(--sage)">Building Automation Stack</p><span class="loading-sub">Mapping your tech setup & integrations</span></div><div id="automationOutput" class="hidden"></div><div id="automationError"></div><div class="btn-row hidden" id="automationBtns"><button class="btn btn-primary" onclick="goHome()">🏠 Home</button><button class="btn btn-outline" onclick="copyOutput('automation')">Copy</button><button class="btn btn-outline" onclick="openModal()">📄 Export All</button><button class="btn btn-outline" onclick="rerun('automation')">↺ Redo</button></div></div></div>
+
+  <!-- LEGAL -->
+  <div class="screen" id="screen-legal"><div class="sec-head"><div class="sec-eyebrow">Business OS</div><h1 class="sec-title">Legal <em>Templates</em></h1><p class="sec-desc">Refund policy, terms of service, earnings disclaimer, FTC-compliant pages.</p></div><div class="card"><div id="legalLoading" class="loading-state"><div class="spinner"></div><p class="loading-label">Writing Legal Templates</p><span class="loading-sub">Generating customisable legal pages</span></div><div id="legalOutput" class="hidden"></div><div id="legalError"></div><div class="btn-row hidden" id="legalBtns"><button class="btn btn-primary" onclick="nextStep('legal','kpis')">KPIs →</button><button class="btn btn-outline" onclick="copyOutput('legal')">Copy All</button><button class="btn btn-outline" onclick="rerun('legal')">↺ Redo</button></div></div></div>
+
+  <!-- KPIS -->
+  <div class="screen" id="screen-kpis"><div class="sec-head"><div class="sec-eyebrow">Business OS</div><h1 class="sec-title">KPIs & <em>Revenue</em></h1><p class="sec-desc">Conversion benchmarks, weekly tracking metrics, and a 90-day revenue projection.</p></div><div class="card"><div id="kpisLoading" class="loading-state"><div class="spinner"></div><p class="loading-label">Calculating KPIs</p><span class="loading-sub">Modelling revenue scenarios</span></div><div id="kpisOutput" class="output hidden"></div><div id="kpisError"></div><div class="btn-row hidden" id="kpisBtns"><button class="btn btn-primary" onclick="goTo('coach')">🧠 Talk to Coach</button><button class="btn btn-outline" onclick="copyOutput('kpis')">Copy</button><button class="btn btn-outline" onclick="openModal()">📄 Export All</button><button class="btn btn-outline" onclick="rerun('kpis')">↺ Redo</button></div></div></div>
+
+  <!-- AI COACH -->
+  <div class="screen" id="screen-coach">
+    <div class="sec-head"><div class="sec-eyebrow">Business OS</div><h1 class="sec-title">Your <em>AI Business Coach</em></h1><p class="sec-desc">Ask anything — specific advice for your exact situation.</p></div>
+    <div style="display:grid;grid-template-columns:1fr 275px;gap:20px">
+      <div>
+        <div class="mentor-win">
+          <div class="mentor-header">
+            <div class="mentor-av">✦</div>
+            <div class="mentor-name-wrap"><div class="mentor-name">Your Business Coach</div><div class="mentor-sub">Prodigy AI — personalised advice</div></div>
+            <div class="mentor-online">Online now</div>
+          </div>
+          <div class="mentor-msgs" id="coachMsgs">
+            <div class="mmsg mentor"><div class="mmsg-av">✦</div><div class="mmsg-bub">Hey! I know your profile and everything you've built. Ask me anything — pricing, first customer, launch strategy, content, mindset. I give specific advice for <strong>your situation</strong>. 🚀</div></div>
+          </div>
+          <div class="mentor-foot">
+            <input type="text" id="coachInput" placeholder="Ask your coach anything…" onkeydown="if(event.key==='Enter')sendCoach()">
+            <button class="btn btn-primary btn-sm" onclick="sendCoach()">Send</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="card violet" style="margin:0">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--violet);text-transform:uppercase;margin-bottom:8px;font-weight:700">💡 Tip</div>
+          <p style="font-size:12px;color:var(--ink-3);line-height:1.65">Specific questions get specific answers. "How do I get my first customer this week" beats "how do I grow".</p>
+        </div>
+        <div class="card" style="margin:0">
+          <div class="card-title" style="margin-bottom:10px;font-size:15px">Quick Questions</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button class="btn btn-outline btn-xs" style="justify-content:flex-start;text-align:left;border-radius:var(--r-xs);font-size:12px" onclick="askCoach('How do I get my first paying customer this week?')">🎯 First customer?</button>
+            <button class="btn btn-outline btn-xs" style="justify-content:flex-start;text-align:left;border-radius:var(--r-xs);font-size:12px" onclick="askCoach('Is my pricing strategy right? Be honest.')">💰 Is my pricing right?</button>
+            <button class="btn btn-outline btn-xs" style="justify-content:flex-start;text-align:left;border-radius:var(--r-xs);font-size:12px" onclick="askCoach('What is the single highest ROI thing I can do this week?')">⚡ Highest ROI this week?</button>
+            <button class="btn btn-outline btn-xs" style="justify-content:flex-start;text-align:left;border-radius:var(--r-xs);font-size:12px" onclick="askCoach('Give me a realistic 90-day plan to make my first $10,000.')">📈 90-day plan to $10k</button>
+            <button class="btn btn-outline btn-xs" style="justify-content:flex-start;text-align:left;border-radius:var(--r-xs);font-size:12px" onclick="askCoach('I have zero audience. Where do I start exactly?')">📣 Zero audience — help</button>
+            <button class="btn btn-outline btn-xs" style="justify-content:flex-start;text-align:left;border-radius:var(--r-xs);font-size:12px" onclick="askCoach('I am scared to launch and put myself out there.')">😰 Scared to launch</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div><!-- app-layout -->
+
+<script>
+
+// ═══════════════════════════════════════════
+// SUPABASE — AUTH & CLOUD STORAGE
+// ═══════════════════════════════════════════
+const SUPA_URL = 'https://xlgaubepuzmobqomnriz.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhsZ2F1YmVwdXptb2Jxb21ucml6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NjUzMTEsImV4cCI6MjA5MzI0MTMxMX0.nhKy-0d1_4pKSf1_nDfVQ-xdT_soc_Ze7U2_3TFNLwQ';
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+let currentUser = null;
+let currentProjectId = null;
+let saveTimer = null;
+let authMode = 'signin';
+
+// ── AUTH UI ──
+function openAuthModal() {
+  document.getElementById('authModal').classList.remove('hidden');
+  document.getElementById('authEmail').focus();
+}
+function closeAuthModal() {
+  document.getElementById('authModal').classList.add('hidden');
+  document.getElementById('authError').innerHTML = '';
+}
+
+function switchAuthTab(mode) {
+  authMode = mode;
+  const signin = document.getElementById('tabSignin');
+  const signup = document.getElementById('tabSignup');
+  const btn    = document.getElementById('authBtn');
+  const title  = document.getElementById('authTitle');
+  const sub    = document.getElementById('authSub');
+  if (mode === 'signin') {
+    signin.style.background = 'var(--white)'; signin.style.color = 'var(--ink)'; signin.style.boxShadow = 'var(--shadow-sm)';
+    signup.style.background = 'none'; signup.style.color = 'var(--ink-3)'; signup.style.boxShadow = 'none';
+    btn.textContent = 'Sign In';
+    title.innerHTML = 'Welcome back to <em style="color:var(--violet);font-style:italic">Prodigy</em>';
+    sub.textContent = 'Sign in to access your saved projects.';
+  } else {
+    signup.style.background = 'var(--white)'; signup.style.color = 'var(--ink)'; signup.style.boxShadow = 'var(--shadow-sm)';
+    signin.style.background = 'none'; signin.style.color = 'var(--ink-3)'; signin.style.boxShadow = 'none';
+    btn.textContent = 'Create Account';
+    title.innerHTML = 'Join <em style="color:var(--violet);font-style:italic">Prodigy</em>';
+    sub.textContent = 'Create an account to save your work forever.';
+  }
+}
+
+async function handleAuth() {
+  const email    = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const errEl    = document.getElementById('authError');
+  const btn      = document.getElementById('authBtn');
+  if (!email || !password) { errEl.innerHTML = '<div class="error-box">Please fill in both fields.</div>'; return; }
+  btn.textContent = 'Please wait…'; btn.disabled = true;
+  errEl.innerHTML = '';
+  try {
+    let result;
+    if (authMode === 'signup') {
+      result = await supa.auth.signUp({ email, password });
+      if (result.error) throw result.error;
+      if (result.data.user && !result.data.session) {
+        errEl.innerHTML = '<div style="background:var(--sage-soft);border:1px solid var(--sage-b);border-radius:var(--r-sm);padding:12px 16px;font-size:13px;color:var(--sage)">✓ Check your email to confirm your account, then sign in.</div>';
+        btn.textContent = 'Create Account'; btn.disabled = false; return;
+      }
+    } else {
+      result = await supa.auth.signInWithPassword({ email, password });
+      if (result.error) throw result.error;
+    }
+    closeAuthModal();
+    toast('Welcome to Prodigy ✓', 'success');
+  } catch(e) {
+    errEl.innerHTML = `<div class="error-box">⚠ ${e.message}</div>`;
+    btn.textContent = authMode === 'signup' ? 'Create Account' : 'Sign In';
+    btn.disabled = false;
+  }
+}
+
+async function signOut() {
+  await supa.auth.signOut();
+  currentUser = null; currentProjectId = null;
+  document.getElementById('userBar').classList.add('hidden');
+  document.getElementById('projectBar').classList.add('hidden');
+  document.getElementById('authNavBtn').textContent = 'Sign In';
+  document.getElementById('authNavBtn').onclick = openAuthModal;
+  toast('Signed out', 'info');
+}
+
+// ── SESSION LISTENER ──
+function initSupabaseAuth() {
+  supa.auth.onAuthStateChange(async (event, session) => {
+    if (session?.user) {
+      currentUser = session.user;
+      onUserSignedIn();
+    } else {
+      currentUser = null;
+      document.getElementById('userBar').classList.add('hidden');
+      document.getElementById('projectBar').classList.add('hidden');
+    }
+  });
+}
+
+async function onUserSignedIn() {
+  // Update nav button
+  const navBtn = document.getElementById('authNavBtn');
+  navBtn.textContent = '✓ Saved';
+  navBtn.onclick = () => {};
+  navBtn.style.background = 'var(--sage-soft)';
+  navBtn.style.borderColor = 'var(--sage-b)';
+  navBtn.style.color = 'var(--sage)';
+
+  // Show user bar
+  const email = currentUser.email;
+  document.getElementById('userEmail').textContent = email;
+  document.getElementById('userAvatar').textContent = email[0].toUpperCase();
+  document.getElementById('userBar').classList.remove('hidden');
+
+  // Load projects
+  await loadProjects();
+}
+
+// ── PROJECTS ──
+async function loadProjects() {
+  if (!currentUser) return;
+  const { data, error } = await supa
+    .from('prodigy_projects')
+    .select('id, project_name, updated_at')
+    .eq('user_id', currentUser.id)
+    .order('updated_at', { ascending: false });
+
+  if (error) { console.error('Load projects error:', error); return; }
+
+  const select = document.getElementById('projectSelect');
+
+  if (!data || data.length === 0) {
+    // First time — create a default project
+    await createProject('My First Product');
+    return;
+  }
+
+  // Populate dropdown
+  select.innerHTML = data.map(p =>
+    `<option value="${p.id}">${p.project_name}</option>`
+  ).join('');
+
+  document.getElementById('projectBar').classList.remove('hidden');
+
+  // Load most recent project
+  currentProjectId = data[0].id;
+  await loadProject(currentProjectId);
+}
+
+async function loadProject(projectId) {
+  if (!currentUser || !projectId) return;
+  const { data, error } = await supa
+    .from('prodigy_projects')
+    .select('*')
+    .eq('id', projectId)
+    .single();
+
+  if (error || !data) return;
+
+  // Restore profile fields
+  const fields = ['skills','audience','productType','priceRange','platform','audienceSize'];
+  fields.forEach(k => {
+    const el = document.getElementById(k === 'productType' ? 'productType' : k === 'priceRange' ? 'priceRange' : k === 'audienceSize' ? 'audienceSize' : k);
+    if (el && data[toSnake(k)]) { el.value = data[toSnake(k)]; S[k] = data[toSnake(k)]; }
+  });
+
+  if (data.idea)           S.idea = data.idea;
+  if (data.idea_audience)  S.ideaAudience = data.idea_audience;
+  if (data.selected_format) S.selectedFormat = data.selected_format;
+
+  // Restore outputs
+  if (data.outputs) {
+    Object.entries(data.outputs).forEach(([id, html]) => {
+      if (!html) return;
+      S[id] = html;
+      const out = document.getElementById(id + 'Output');
+      if (out) { out.innerHTML = html; out.classList.remove('hidden'); }
+      const load = document.getElementById(id + 'Loading');
+      if (load) load.classList.add('hidden');
+      const btns = document.getElementById(id + 'Btns');
+      if (btns) btns.classList.remove('hidden');
+      out?.querySelector('.copy-section-body')?.classList.add('open');
+    });
+  }
+
+  // Restore completed
+  if (data.completed) {
+    data.completed.forEach(id => {
+      S.completed.add(id);
+      const chk = document.getElementById('chk-' + id);
+      if (chk) chk.classList.remove('hidden');
+    });
+  }
+
+  currentProjectId = projectId;
+  updateProgress();
+  buildToolGrid(null);
+  setSaveStatus('All changes saved ✓');
+  toast('Project loaded ✓', 'success');
+}
+
+async function createProject(name) {
+  if (!currentUser) return;
+  const { data, error } = await supa
+    .from('prodigy_projects')
+    .insert({ user_id: currentUser.id, project_name: name })
+    .select()
+    .single();
+
+  if (error) { console.error('Create project error:', error); return; }
+
+  currentProjectId = data.id;
+  const select = document.getElementById('projectSelect');
+  select.innerHTML += `<option value="${data.id}" selected>${name}</option>`;
+  select.value = data.id;
+  document.getElementById('projectBar').classList.remove('hidden');
+  toast(`Project "${name}" created ✓`, 'success');
+}
+
+async function newProject() {
+  const name = prompt('Project name:', 'New Digital Product');
+  if (!name) return;
+  // Reset state
+  S.completed = new Set();
+  S.skills = ''; S.audience = ''; S.idea = '';
+  TRACKED.forEach(id => { S[id] = ''; });
+  ['skills','audience','productType','priceRange','platform','audienceSize'].forEach(k => {
+    const el = document.getElementById(k); if (el) el.value = '';
+  });
+  updateProgress(); buildToolGrid(null);
+  await createProject(name);
+}
+
+async function switchProject(projectId) {
+  if (!projectId || projectId === currentProjectId) return;
+  // Clear current state
+  S.completed = new Set();
+  TRACKED.forEach(id => {
+    S[id] = '';
+    const out = document.getElementById(id + 'Output');
+    if (out) { out.innerHTML = ''; out.classList.add('hidden'); }
+    const btns = document.getElementById(id + 'Btns');
+    if (btns) btns.classList.add('hidden');
+    const load = document.getElementById(id + 'Loading');
+    if (load) load.classList.remove('hidden');
+    const chk = document.getElementById('chk-' + id);
+    if (chk) chk.classList.add('hidden');
+  });
+  document.querySelectorAll('.sb-check').forEach(el => el.classList.add('hidden'));
+  updateProgress(); buildToolGrid(null);
+  await loadProject(projectId);
+}
+
+// ── CLOUD SAVE ──
+function toSnake(camel) {
+  return camel.replace(/([A-Z])/g, '_$1').toLowerCase();
+}
+
+async function cloudSave() {
+  if (!currentUser || !currentProjectId) return;
+  setSaveStatus('Saving…');
+  const outputs = {};
+  TRACKED.forEach(id => { if (S[id]) outputs[id] = S[id]; });
+
+  const { error } = await supa
+    .from('prodigy_projects')
+    .update({
+      skills:          S.skills,
+      audience:        S.audience,
+      product_type:    S.productType,
+      price_range:     S.priceRange,
+      platform:        S.platform,
+      audience_size:   S.audienceSize,
+      idea:            S.idea,
+      idea_audience:   S.ideaAudience,
+      selected_format: S.selectedFormat,
+      outputs:         outputs,
+      completed:       [...S.completed],
+      updated_at:      new Date().toISOString()
+    })
+    .eq('id', currentProjectId);
+
+  if (error) { setSaveStatus('Save failed ✗'); return; }
+  setSaveStatus('All changes saved ✓');
+}
+
+function debouncedSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    if (currentUser) cloudSave();
+    else saveData(); // fallback to localStorage
+  }, 1500);
+}
+
+function setSaveStatus(msg) {
+  const el = document.getElementById('saveStatus');
+  if (el) el.textContent = msg;
+}
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const S = {
+  skills:'', audience:'', productType:'', priceRange:'',
+  platform:'', audienceSize:'',
+  idea:'', ideaAudience:'', selectedFormat:'',
+  selectedPlatforms:[], selectedMarket:'',
+  uvz:'', names:'', charter:'', templates:'', pricing:'',
+  listing:'', welcome:'', quiz:'', salespage:'', emails:'',
+  hooks:'', script:'', brand:'', marketing:'',
+  seo:'', calendar:'', funnel:'', onboarding:'',
+  affiliate:'', automation:'', legal:'', kpis:'',
+  savedImages:[], selectedImages:[],
+  completed: new Set()
+};
+
+const ALL_SCREENS = [
+  'home','validate','profile','images','imagegen',
+  'uvz','names','charter','templates','pricing',
+  'listing','welcome','quiz',
+  'salespage','emails','hooks','script','brand',
+  'marketing','seo','calendar','funnel','onboarding',
+  'affiliate','automation','legal','kpis','coach'
+];
+
+const TRACKED = [
+  'uvz','names','charter','templates','pricing',
+  'listing','welcome','quiz',
+  'salespage','emails','hooks','script','brand',
+  'marketing','seo','calendar','funnel','onboarding',
+  'affiliate','automation','legal','kpis'
+];
+
+const MODULE_META = [
+  {id:'validate',  icon:'🧠', title:'Idea Validator',     group:'Start Here'},
+  {id:'profile',   icon:'👤', title:'Your Profile',       group:'Start Here'},
+  {id:'images',    icon:'🖼️', title:'Image Library',      group:'Start Here'},
+  {id:'imagegen',  icon:'🤖', title:'AI Image Studio',    group:'Start Here'},
+  {id:'uvz',       icon:'🎯', title:'UVZ Analysis',       group:'Digital Studio'},
+  {id:'names',     icon:'✍️', title:'Product Names',      group:'Digital Studio'},
+  {id:'charter',   icon:'📋', title:'Product Charter',    group:'Digital Studio'},
+  {id:'templates', icon:'📊', title:'Templates & Tools',  group:'Digital Studio'},
+  {id:'pricing',   icon:'💎', title:'Pricing Strategy',   group:'Digital Studio'},
+  {id:'listing',   icon:'🛍️', title:'Marketplace Listing',group:'Digital Studio'},
+  {id:'welcome',   icon:'🎓', title:'Welcome Page',       group:'Digital Studio'},
+  {id:'quiz',      icon:'📝', title:'Quiz Builder',       group:'Digital Studio'},
+  {id:'salespage', icon:'💰', title:'Sales Page',         group:'GhostWriter OS'},
+  {id:'emails',    icon:'📧', title:'Email Sequence',     group:'GhostWriter OS'},
+  {id:'hooks',     icon:'🪝', title:'Hooks & Ads',        group:'GhostWriter OS'},
+  {id:'script',    icon:'🎬', title:'Video Script',       group:'GhostWriter OS'},
+  {id:'brand',     icon:'🎨', title:'Brand Voice',        group:'GhostWriter OS'},
+  {id:'marketing', icon:'📣', title:'Platform Content',   group:'Marketing Engine'},
+  {id:'seo',       icon:'🔍', title:'SEO Blog Post',      group:'Marketing Engine'},
+  {id:'calendar',  icon:'📅', title:'Content Calendar',   group:'Marketing Engine'},
+  {id:'funnel',    icon:'🔁', title:'Full Funnel',        group:'Marketing Engine'},
+  {id:'onboarding',icon:'🚀', title:'Onboarding Flow',    group:'Marketing Engine'},
+  {id:'affiliate', icon:'🤝', title:'Affiliate System',   group:'Marketing Engine'},
+  {id:'automation',icon:'⚡', title:'Automation Guide',   group:'Marketing Engine'},
+  {id:'legal',     icon:'⚖️', title:'Legal Templates',    group:'Business OS'},
+  {id:'kpis',      icon:'📈', title:'KPIs & Revenue',     group:'Business OS'},
+  {id:'coach',     icon:'🧠', title:'AI Coach',           group:'Business OS'},
+];
+
+const PATH_TOOLS = {
+  studio:    ['validate','uvz','names','charter','templates','pricing','listing','welcome','quiz'],
+  copy:      ['salespage','emails','hooks','script','brand'],
+  marketing: ['marketing','seo','calendar','funnel','onboarding','affiliate','automation']
+};
+
+// ═══════════════════════════════════════════
+// IDEA CATEGORIES & DATA
+// ═══════════════════════════════════════════
+const IDEA_CATS = [
+  { icon:'📓', name:'Planners',     ideas:[
+    {name:'Productivity Planner', note:'Daily/weekly planning system'},
+    {name:'Goal Planner',         note:'90-day goal achievement'},
+    {name:'Self Care Planner',    note:'Wellness & mental health'},
+    {name:'Fitness Planner',      note:'Workout & nutrition tracking'},
+    {name:'Meal Planning Kit',    note:'Weekly meal prep system'},
+    {name:'Finance Planner',      note:'Budget & savings tracker'},
+  ]},
+  { icon:'📚', name:'Ebooks',       ideas:[
+    {name:'How-To Guide',         note:'Step-by-step instruction book'},
+    {name:'Recipe Ebook',         note:'Niche recipe collection'},
+    {name:'Beginner\'s Blueprint', note:'Start from zero framework'},
+    {name:'Strategy Playbook',    note:'Advanced tactics & systems'},
+    {name:'Case Study Collection',note:'Real examples & breakdowns'},
+    {name:'Resource Handbook',    note:'Reference guide & directory'},
+  ]},
+  { icon:'🎓', name:'Courses',      ideas:[
+    {name:'Video Course',         note:'Multi-module teaching programme'},
+    {name:'Mini Course',          note:'Quick win in 5-7 lessons'},
+    {name:'Workshop',             note:'Live or recorded deep dive'},
+    {name:'Bootcamp',             note:'Intensive transformation programme'},
+    {name:'Certification',        note:'Skill verification programme'},
+    {name:'Masterclass',          note:'Expert-led single topic'},
+  ]},
+  { icon:'🖨️', name:'Printables',   ideas:[
+    {name:'Checklists Pack',      note:'Task & process checklists'},
+    {name:'Affirmation Cards',    note:'Daily mindset cards'},
+    {name:'Wall Art Prints',      note:'Motivational home decor'},
+    {name:'Sticker Pack',         note:'Digital or print stickers'},
+    {name:'Gratitude Journal',    note:'Daily reflection pages'},
+    {name:'Kids Activity Sheets', note:'Educational printables'},
+  ]},
+  { icon:'🎨', name:'Templates',    ideas:[
+    {name:'Canva Social Templates',note:'Ready-to-edit social graphics'},
+    {name:'CV / Resume Template', note:'Professional job application'},
+    {name:'Business Card Pack',   note:'Brand identity templates'},
+    {name:'Presentation Deck',    note:'Pitch & slide templates'},
+    {name:'Email Templates',      note:'Done-for-you email copy'},
+    {name:'Contract Templates',   note:'Legal document templates'},
+  ]},
+  { icon:'💻', name:'Digital Tools', ideas:[
+    {name:'Notion Template',      note:'All-in-one workspace system'},
+    {name:'Spreadsheet Tracker',  note:'Google Sheets automation'},
+    {name:'Prompt Pack',          note:'AI prompt library by niche'},
+    {name:'Swipe File',           note:'Copy & content inspiration'},
+    {name:'Resource Library',     note:'Curated tools & links'},
+    {name:'SOPs Pack',            note:'Standard operating procedures'},
+  ]},
+  { icon:'🌿', name:'Wellness',     ideas:[
+    {name:'Meditation Guide',     note:'Daily practice programme'},
+    {name:'Sleep Programme',      note:'Better sleep system'},
+    {name:'Habit Tracker Bundle', note:'30-day habit building'},
+    {name:'Anxiety Workbook',     note:'Mental health exercises'},
+    {name:'Nutrition Guide',      note:'Clean eating framework'},
+    {name:'Weight Loss Programme',note:'Sustainable fat loss system'},
+  ]},
+  { icon:'💰', name:'Business',     ideas:[
+    {name:'Freelancer Starter Kit',note:'Launch a freelance business'},
+    {name:'Social Media Strategy',note:'Platform growth playbook'},
+    {name:'Content Creation System',note:'Batch content framework'},
+    {name:'Client Onboarding Pack',note:'Professional client management'},
+    {name:'Pricing Guide',        note:'How to charge what you\'re worth'},
+    {name:'Passive Income Roadmap',note:'Build income streams'},
+  ]},
+];
+
+const FORMATS = [
+  {icon:'🎥', name:'Online Course',   note:'Video lessons + modules'},
+  {icon:'📖', name:'Ebook / PDF',     note:'Written guide or manual'},
+  {icon:'📓', name:'Planner',         note:'Fill-in templates & trackers'},
+  {icon:'🖨️', name:'Printable Pack',  note:'Print-at-home files'},
+  {icon:'🎨', name:'Template Pack',   note:'Canva / design files'},
+  {icon:'💻', name:'Digital Toolkit', note:'Notion, sheets, tools'},
+  {icon:'🤝', name:'Coaching Programme', note:'1:1 or group coaching'},
+  {icon:'🔐', name:'Membership',      note:'Community + content'},
+  {icon:'⚡', name:'Workshop',        note:'Live or recorded intensive'},
+  {icon:'📦', name:'Bundle',          note:'Multiple products combined'},
+];
+
+const PLATFORMS = [
+  {icon:'🎵', name:'TikTok'},
+  {icon:'📸', name:'Instagram'},
+  {icon:'▶️', name:'YouTube'},
+  {icon:'📌', name:'Pinterest'},
+  {icon:'🐦', name:'Twitter / X'},
+  {icon:'💼', name:'LinkedIn'},
+  {icon:'👥', name:'Facebook'},
+  {icon:'📧', name:'Email List'},
+];
+
+const MARKETPLACES = [
+  {icon:'🍩', name:'Gumroad',    note:'Best for digital products'},
+  {icon:'⚡', name:'Whop',       note:'Best for communities'},
+  {icon:'🌿', name:'Etsy',       note:'Best for printables'},
+  {icon:'📦', name:'Stan Store', note:'Creator storefronts'},
+  {icon:'📚', name:'Amazon KDP', note:'Best for ebooks'},
+  {icon:'🏔️', name:'Teachable',  note:'Best for courses'},
+  {icon:'🎓', name:'Gumroad',    note:'Simple & free to start'},
+  {icon:'🌐', name:'Own Website',note:'Full control & no fees'},
+];
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function goTo(id) {
+  ALL_SCREENS.forEach(s => {
+    const el = document.getElementById('screen-' + s);
+    if (el) el.classList.toggle('active', s === id);
+    const nav = document.getElementById('nav-' + s);
+    if (nav) nav.classList.remove('active');
+  });
+  const activeNav = document.getElementById('nav-' + id);
+  if (activeNav) activeNav.classList.add('active');
+  closeSidebar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goHome() {
+  goTo('home');
+  buildToolGrid(null);
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sbOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar')?.classList.remove('open');
+  document.getElementById('sbOverlay')?.classList.remove('open');
+}
+
+function setTab(tab) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab)?.classList.add('active');
+  goTo('home');
+  if (tab === 'all') buildToolGrid(null);
+  else buildToolGrid(PATH_TOOLS[tab] || null);
+}
+
+function gotoWing(wing) {
+  setTab(wing);
+  const first = PATH_TOOLS[wing]?.[0];
+  if (first) navAndGen(first);
+}
+
+async function navAndGen(id) {
+  goTo(id);
+  if (['coach','images','imagegen','profile','validate','marketing','listing','quiz'].includes(id)) return;
+  const out = document.getElementById(id + 'Output');
+  if (out && out.innerHTML && !out.classList.contains('hidden')) return;
+  await runGen(id);
+}
+
+// ═══════════════════════════════════════════
+// TOOL GRID & WINGS
+// ═══════════════════════════════════════════
+function buildWings() {
+  const grid = document.getElementById('wingsGrid');
+  if (!grid) return;
+  grid.innerHTML = `
+    <div class="wing-card" onclick="gotoWing('studio')">
+      <span class="wc-emoji">🏗️</span>
+      <div class="wc-count">9 tools</div>
+      <div class="wc-title">Build a Digital Product</div>
+      <div class="wc-desc">From raw idea to complete product. Validation, charter, pricing, marketplace listing, and more.</div>
+    </div>
+    <div class="wing-card rose-wing" onclick="gotoWing('copy')">
+      <span class="wc-emoji">✍️</span>
+      <div class="wc-count">5 tools</div>
+      <div class="wc-title">Write Copy That Sells</div>
+      <div class="wc-desc">Sales page, launch emails, hooks and ads, word-for-word video script, and brand voice guide.</div>
+    </div>
+    <div class="wing-card sage-wing" onclick="gotoWing('marketing')">
+      <span class="wc-emoji">📣</span>
+      <div class="wc-count">7 tools</div>
+      <div class="wc-title">Market Your Product</div>
+      <div class="wc-desc">Platform-specific content, SEO article, 30-day calendar, funnel, and full automation setup.</div>
+    </div>
+  `;
+}
+
+function buildToolGrid(filter) {
+  const grid = document.getElementById('toolGrid');
+  const label = document.getElementById('tgLabel');
+  if (!grid) return;
+  const tools = filter
+    ? MODULE_META.filter(m => filter.includes(m.id))
+    : MODULE_META;
+  if (label) label.textContent = filter
+    ? `${tools.length} tools in this path — click any to open`
+    : 'All 27 tools — click any to open instantly';
+  grid.innerHTML = tools.map(m => {
+    const done = S.completed.has(m.id);
+    return `<div class="tc${done ? ' done' : ''}" onclick="navAndGen('${m.id}')">
+      <div class="tc-top">
+        <span class="tc-icon">${m.icon}</span>
+        ${done ? '<span class="tc-done-lbl">✓ DONE</span>' : '<span style="font-size:9px;color:var(--ink-4)">—</span>'}
+      </div>
+      <div class="tc-title">${m.title}</div>
+      <div class="tc-group">${m.group}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterTools(q) {
+  const grid = document.getElementById('toolGrid');
+  if (!q.trim()) { buildToolGrid(null); return; }
+  const matches = MODULE_META.filter(m =>
+    m.title.toLowerCase().includes(q.toLowerCase()) ||
+    m.group.toLowerCase().includes(q.toLowerCase())
+  );
+  grid.innerHTML = matches.length
+    ? matches.map(m => `<div class="tc" onclick="navAndGen('${m.id}')">
+        <div class="tc-top"><span class="tc-icon">${m.icon}</span></div>
+        <div class="tc-title">${m.title}</div>
+        <div class="tc-group">${m.group}</div>
+      </div>`).join('')
+    : `<div style="grid-column:1/-1;padding:24px;color:var(--ink-4);font-size:14px">No tools found for "${q}"</div>`;
+}
+
+// ═══════════════════════════════════════════
+// IDEA VALIDATOR FLOW
+// ═══════════════════════════════════════════
+function showIdeaInput() {
+  document.getElementById('validateChoiceCard').classList.add('hidden');
+  document.getElementById('ideaInputCard').classList.remove('hidden');
+}
+
+function showIdeaBrowser() {
+  document.getElementById('validateChoiceCard').classList.add('hidden');
+  document.getElementById('ideaBrowserCard').classList.remove('hidden');
+  buildIdeaCats();
+}
+
+function resetValidate() {
+  document.getElementById('validateChoiceCard').classList.remove('hidden');
+  document.getElementById('ideaInputCard').classList.add('hidden');
+  document.getElementById('ideaBrowserCard').classList.add('hidden');
+  document.getElementById('formatCard').classList.add('hidden');
+  document.getElementById('mentorChatWrap').classList.add('hidden');
+  document.getElementById('ideaOptsWrap').classList.add('hidden');
+  document.getElementById('mentorMsgs').innerHTML = `
+    <div class="mmsg mentor">
+      <div class="mmsg-av">✦</div>
+      <div class="mmsg-bub">Hey — I've seen thousands of digital products succeed and fail. Share your idea and I'll give you an honest read: what works, what worries me, and whether I'd put money behind it. No sugarcoating.</div>
+    </div>`;
+  mentorHistory = [];
+}
+
+function buildIdeaCats() {
+  const grid = document.getElementById('ideaCatGrid');
+  if (!grid) return;
+  grid.innerHTML = IDEA_CATS.map((cat, i) => `
+    <div class="idea-cat" onclick="selectIdeaCat(${i}, this)">
+      <span class="idea-cat-icon">${cat.icon}</span>
+      <div class="idea-cat-name">${cat.name}</div>
+    </div>
+  `).join('');
+}
+
+let selectedBrowserIdea = null;
+function selectIdeaCat(idx, el) {
+  document.querySelectorAll('.idea-cat').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  const cat = IDEA_CATS[idx];
+  document.getElementById('ideaCatTitle').textContent = `${cat.icon} ${cat.name} — Pick an idea`;
+  const optList = document.getElementById('ideaOptList');
+  selectedBrowserIdea = null;
+  document.getElementById('validateBrowserBtn').disabled = true;
+  optList.innerHTML = cat.ideas.map((idea, i) => `
+    <div class="idea-opt" onclick="selectBrowserIdea(this, '${idea.name}', '${idea.note}')">
+      <span class="idea-opt-icon">${cat.icon}</span>
+      <div class="idea-opt-body">
+        <div class="idea-opt-name">${idea.name}</div>
+        <div class="idea-opt-note">${idea.note}</div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('ideaOptsWrap').classList.remove('hidden');
+}
+
+function selectBrowserIdea(el, name, note) {
+  document.querySelectorAll('.idea-opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedBrowserIdea = { name, note };
+  document.getElementById('validateBrowserBtn').disabled = false;
+}
+
+function validateBrowserIdea() {
+  if (!selectedBrowserIdea) return;
+  document.getElementById('ideaText').value = selectedBrowserIdea.name + ' — ' + selectedBrowserIdea.note;
+  S.idea = document.getElementById('ideaText').value;
+  document.getElementById('ideaBrowserCard').classList.add('hidden');
+  document.getElementById('mentorChatWrap').classList.remove('hidden');
+  startMentorWithIdea();
+}
+
+function startMentorChat() {
+  const idea = document.getElementById('ideaText').value.trim();
+  const audience = document.getElementById('ideaAudience').value.trim();
+  if (!idea) { toast('Please describe your idea first', 'error'); return; }
+  S.idea = idea;
+  S.ideaAudience = audience;
+  document.getElementById('ideaInputCard').classList.add('hidden');
+  document.getElementById('mentorChatWrap').classList.remove('hidden');
+  startMentorWithIdea();
+}
+
+async function startMentorWithIdea() {
+  const idea = S.idea;
+  const audience = S.ideaAudience || 'not specified';
+  const firstMsg = `My idea: ${idea}\nTarget audience: ${audience}`;
+  await sendMentorMsg(firstMsg, true);
+}
+
+function proceedToFormat() {
+  document.getElementById('mentorChatWrap').classList.add('hidden');
+  document.getElementById('formatCard').classList.remove('hidden');
+  buildFormatGrid();
+}
+
+function buildFormatGrid() {
+  const grid = document.getElementById('formatGrid');
+  if (!grid) return;
+  grid.innerHTML = FORMATS.map((f, i) => `
+    <div class="fmt" onclick="selectFormat(this, '${f.name}')">
+      <span class="fmt-icon">${f.icon}</span>
+      <div class="fmt-name">${f.name}</div>
+      <div class="fmt-note">${f.note}</div>
+    </div>
+  `).join('');
+}
+
+function selectFormat(el, name) {
+  document.querySelectorAll('.fmt').forEach(f => f.classList.remove('sel'));
+  el.classList.add('sel');
+  S.selectedFormat = name;
+}
+
+function confirmFormat() {
+  if (!S.selectedFormat) { toast('Pick a format first', 'error'); return; }
+  markDone('validate');
+  toast(`Format set: ${S.selectedFormat} ✓`, 'success');
+  goTo('profile');
+}
+
+// ═══════════════════════════════════════════
+// PROVEN PRODUCTS DATABASE
+// ═══════════════════════════════════════════
+const PROVEN_PRODUCTS = [
+  { name:'Trim Down Club',          niche:['weight','nutrition','health','diet','food','fat','slim','fitness','meal'],          price:'$1.99 trial → $38.95/cycle', platform:'ClickBank',    revenue:'$40,000/month',  why:'Personalised meal plans remove daily decision fatigue. Weight loss is a repeat-buy category.',                                   angle:'Build a personalised system, not a generic diet. Make it feel like it was made for them specifically.' },
+  { name:'Social Army',             niche:['tiktok','social media','creator','content','affiliate','shop','income','monetise'], price:'$39/month',                  platform:'Whop',         revenue:'$39,000/month',  why:'TikTok Shop is exploding. Creators need a community to navigate it together.',                                                   angle:'Find a fast-growing platform people are already trying to monetise and build the strategy community around it.' },
+  { name:'Yang Mun',                niche:['spiritual','healing','wellness','mindset','anxiety','emotional','mental','peace'],   price:'$9.99–$49.99',               platform:'Whop',         revenue:'$32,000/month',  why:'Emotional pain is universal. Low entry price + product ladder converts massive volume.',                                           angle:'Start with a $9.99 ebook as a door opener. Ladder them to a $49.99 programme and a monthly community.' },
+  { name:"Ted's Woodworking",       niche:['woodworking','diy','craft','build','furniture','workshop','tools','shed','plans'],   price:'$67 one-time',               platform:'ClickBank',    revenue:'$16,750/month',  why:'DIY hobbyists always need new plans. Faceless brand + 75% affiliate commission = self-running traffic machine.',                  angle:'Build a library product not a course. One-time buy, lifetime access, affiliate-driven.' },
+  { name:'CyberFlow',               niche:['hacking','cybersecurity','tech','coding','programming','it','computer','security'],  price:'$29/month or $399',          platform:'Whop',         revenue:'$13,920/month',  why:'"Restricted content" framing creates urgency. Cybersecurity skill gap is massive and growing.',                                    angle:'Position your content as what mainstream platforms restrict. Exclusivity drives subscriptions.' },
+  { name:'The Lost Superfoods',     niche:['survival','prepper','food','emergency','homestead','off-grid','self-sufficient'],    price:'$37 one-time',               platform:'ClickBank',    revenue:'$10,000/month',  why:'Fear-based buying + evergreen problem + affiliate army. Every news event sends a new wave of buyers.',                           angle:'Tap into self-sufficiency anxiety. Position around food security and independence from systems.' },
+  { name:'My Shed Plans',           niche:['shed','garden','outdoor','backyard','construction','build','diy','plans'],           price:'$37 one-time',               platform:'ClickBank',    revenue:'$9,250/month',   why:'Someone will always want to build a shed. Faceless brand running since 2012 on pure affiliates.',                                angle:'Find a physical project people always want to do. Library of plans beats single tutorial.' },
+  { name:'Children Learning Reading',niche:['children','kids','parenting','reading','education','phonics','school','learning'],  price:'$69–$89',                    platform:'ClickBank',    revenue:'$6,000/month',   why:'Parental anxiety about child development is a powerful purchase trigger. Evergreen — new parents every year.',                   angle:'Target the parental fear. Position it as what schools use but simplified for home.' },
+  { name:'Brain Training For Dogs', niche:['dogs','pets','animals','training','behaviour','puppy'],                              price:'$47 one-time',               platform:'ClickBank',    revenue:'$5,000/month',   why:'Dog owners are emotionally attached + embarrassed by bad behaviour. Community word-of-mouth built in.',                          angle:'Reframe the problem — bad behaviour is boredom, not disobedience. That shift changes everything.' },
+  { name:'Signorama',               niche:['singing','music','voice','vocal','song','performance','artist'],                     price:'$67–$89',                    platform:'ClickBank',    revenue:'$5,000/month',   why:'Singing is a skill people wish they had but assume requires natural talent. Reframing it as learnable unlocks a massive market.',  angle:'Attack the talent myth. Position as a daily 15-minute system, not a talent programme.' },
+  { name:'EZ Battery Reconditioning',niche:['battery','electric','diy','save money','home','car','solar','energy'],              price:'$47 one-time',               platform:'ClickBank',    revenue:'$4,700/month',   why:'Universal pain point — everyone owns batteries. Off-grid angle adds a second passionate buyer type.',                            angle:'Lead with the money-saving angle. Everyone spends on batteries. Position as the fix.' },
+  { name:'Plant-Based Recipe Cookbook',niche:['vegan','plant','recipe','cooking','food','diet','health','clean eating'],         price:'$27 one-time',               platform:'ClickBank',    revenue:'$4,000/month',   why:'Health trend + impulse price + affiliate funnel. No face, no following — just clean content and commissions.',                    angle:'$27 is an impulse buy. Lead with one transformation promise. Build the funnel behind it.' },
+  { name:'Wedding Kit Pro',         niche:['wedding','bride','planning','event','templates','canva','organise'],                 price:'$9 one-time',                platform:'Etsy',         revenue:'$3,000/month',   why:'$9 removes all hesitation. Brides share with their wedding party creating organic referrals.',                                   angle:'Price for virality not margin. At $9 people share it. Volume beats margin at this price.' },
+  { name:'Pencil Drawing Made Easy',niche:['drawing','art','sketch','illustration','creative','design','pencil'],                price:'$47 one-time',               platform:'ClickBank',    revenue:'$3,000–6,000/mo', why:'Reframes drawing as method transfer not talent. Buyer pool becomes everyone who ever wanted to draw.',                           angle:'Attack the "I am not talented" belief. That one reframe opens the market to everyone.' },
+  { name:'Emotional Mastery',       niche:['emotions','anger','trauma','relationships','mental','confidence','self','nlp'],      price:'$29 one-time',               platform:'Hotmart',      revenue:'$1,700–3,100/mo', why:'Emotional dysregulation bleeds into every area of life — jobs, relationships, sleep. Universal pain.',                          angle:'List the life consequences of emotional dysregulation. The product sells itself.' },
+];
+
+function findProvenMatch(idea) {
+  if (!idea) return null;
+  const words = idea.toLowerCase().split(/\s+/);
+  let best = null, bestScore = 0;
+  PROVEN_PRODUCTS.forEach(p => {
+    const score = p.niche.filter(n => words.some(w => w.includes(n) || n.includes(w))).length;
+    if (score > bestScore) { bestScore = score; best = p; }
+  });
+  return bestScore >= 1 ? best : null;
+}
+
+// ═══════════════════════════════════════════
+// MENTOR CHAT (Validator)
+// ═══════════════════════════════════════════
+let mentorHistory = [];
+
+async function sendMentor() {
+  const inp = document.getElementById('mentorInput');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+  await sendMentorMsg(msg, false);
+}
+
+async function sendMentorMsg(msg, isAuto) {
+  const msgs = document.getElementById('mentorMsgs');
+  mentorHistory.push({ role: 'user', content: msg });
+
+  if (!isAuto) {
+    msgs.innerHTML += `
+      <div class="mmsg user">
+        <div class="mmsg-av">👤</div>
+        <div class="mmsg-bub">${msg}</div>
+      </div>`;
+  }
+
+  const tid = 'tid' + Date.now();
+  msgs.innerHTML += `
+    <div class="mmsg mentor" id="${tid}">
+      <div class="mmsg-av">✦</div>
+      <div class="mmsg-bub"><span class="tdot"></span><span class="tdot"></span><span class="tdot"></span></div>
+    </div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Find closest proven product match
+  const provenMatch = findProvenMatch(S.idea || '');
+  const matchContext = provenMatch
+    ? `\n\nCLOSEST PROVEN PRODUCT IN DATABASE:\nName: ${provenMatch.name}\nPrice: ${provenMatch.price}\nPlatform: ${provenMatch.platform}\nMonthly Revenue: ${provenMatch.revenue}\nWhy it works: ${provenMatch.why}\nDifferentiation angle for user: ${provenMatch.angle}`
+    : '';
+
+  const sys = `You are a seasoned digital product business mentor with 40 years of experience. You think like a commercial strategist, not a cheerleader.
+
+YOUR PAIN POINT FRAMEWORK — run every idea through this silently:
+1. URGENCY — Is this a problem people need to solve NOW or someday?
+2. WORSENING — Does it get worse the longer they ignore it? (burnout, debt, weight gain, loneliness — these compound)
+3. TRIPLE BLEED — Does it affect MONEY, HEALTH, and RELATIONSHIPS simultaneously? The more it bleeds across all three, the more powerful the product.
+
+SCORING (never show numbers, just use language):
+- Hits all 3 = "This is a golden problem. People are desperate for this."
+- Hits 2 = "Strong idea. Here's how to sharpen the pain angle."
+- Hits 1 = "Weak pain point. Let me show you how to reframe this."
+
+PROVEN PRODUCTS DATABASE — 25 real products making real money:
+1. Trim Down Club — $40k/month — Nutrition membership — ClickBank — Weight loss that compounds daily
+2. Social Army — $39k/month — TikTok community — Whop — Income problem getting worse as creators struggle alone
+3. Yang Mun — $32k/month — Spiritual ebooks — Whop — Emotional pain, low entry price, product ladder
+4. Ted's Woodworking — $16.75k/month — DIY plans — ClickBank — Permanent hobby niche, faceless, affiliate-driven
+5. CyberFlow — $13.9k/month — Cybersecurity — Whop — Growing skill gap, restricted content angle
+6. The Lost Superfoods — $10k/month — Survival guide — ClickBank — Fear-based, evergreen, affiliate-driven
+7. My Shed Plans — $9.25k/month — DIY blueprints — ClickBank — Faceless, problem never goes away
+8. Map Creator Success — $8.4k/month — Gaming community — Whop — Hyper-specific niche, $250/month
+9. Ultimate Small Shop — $7.875k/month — Woodworking — ClickBank — Same audience earlier in journey
+10. Build a Container Home — $6.5k/month — Construction guide — ClickBank — Affordable housing trend
+11. Only Bands Money Group — $6.5k/month — Finance community — Whop — Money anxiety, subscription
+12. Children Learning Reading — $6k/month — Phonics program — ClickBank — Parental anxiety, evergreen
+13. Wholesale Atlas — $5.257k/month — Real estate SaaS — Whop — High monthly, professional niche
+14. Signorama — $5k/month — Singing program — ClickBank — Skill most people wish they had
+15. Brain Training For Dogs — $5k/month — Dog training — ClickBank — Emotional + practical pain
+16. EZ Battery Reconditioning — $4.7k/month — DIY guide — ClickBank — Faceless, universal pain point
+17. PokePings — $4.5k/month — Pokemon community — Whop — Hyper-niche, FOMO-driven
+18. Plant-Based Recipe Cookbook — $4k/month — Recipe ebook — ClickBank — Health trend, low price
+19. WoW Gold Guide — $3.1k/month — Gaming ebook — Gumroad — Micro-niche, lifetime updates angle
+20. Jawad's Method — $3.077k/month — Appearance coaching — Whop — Self-confidence, young men niche
+21. Wedding Kit Pro — $3k/month — Template bundle — Etsy — $9 impulse buy, evergreen buyer pool
+22. Pencil Drawing Made Easy — $3-6k/month — Drawing course — ClickBank — Talent myth reframe
+23. Aquaponics 4 You — $2k/month — Gardening guide — ClickBank — Quiet niche, affiliate long tail
+24. Ambassador Academy — $2k/month — SHEIN program — Whop — Do what you already do, get paid
+25. Emotional Mastery — $1.7-3.1k/month — NLP program — Hotmart — Emotional dysregulation, universal pain
+
+KEY PATTERNS FROM THE DATA:
+- $37 and $47 are impulse buy sweet spots for one-time products
+- Whop is winning for communities, ClickBank for faceless products
+- Faceless products work — 9/25 have no personal brand
+- Problems that never go away = evergreen revenue (sheds, weight, reading, drawing)
+- Product ladders beat single products — start cheap, upsell higher
+- Affiliates are a force multiplier — 75% commission = army of sellers
+
+YOUR RESPONSE STYLE:
+- Warm but commercially honest — like a trusted mentor over coffee
+- Always reference their SPECIFIC idea and audience, never give generic advice
+- When you spot the pain level, tell them directly in plain language
+- When a proven product matches their niche, mention it naturally — "This reminds me of X which makes $Y/month — here's what makes it work and how you'd do it differently"
+- Keep replies conversational — 4-6 sentences, not bullet points unless listing steps
+- Use <strong> to highlight key points
+- After giving your assessment, naturally invite them to either refine the idea or proceed to choose a format
+
+Their idea: ${S.idea || 'not yet shared'}
+Their audience: ${S.ideaAudience || 'not yet shared'}
+Their profile: Skills: ${S.skills || 'not set'}, Platform: ${S.platform || 'not set'}${matchContext}`;
+
+  try {
+    const res = await fetch('https://eom18ql3k7bgfo9.m.pipedream.net', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        system: sys,
+        messages: mentorHistory
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.map(b => b.text || '').join('') || 'Sorry, try again.';
+    mentorHistory.push({ role: 'assistant', content: reply });
+    document.getElementById(tid).querySelector('.mmsg-bub').innerHTML =
+      reply.replace(/\n/g, '<br>');
+  } catch (e) {
+    document.getElementById(tid).querySelector('.mmsg-bub').textContent = 'Connection error. Please retry.';
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ═══════════════════════════════════════════
+// PLATFORM & MARKETPLACE PICKERS
+// ═══════════════════════════════════════════
+function buildPlatformGrid() {
+  const grid = document.getElementById('platformGrid');
+  if (!grid) return;
+  grid.innerHTML = PLATFORMS.map(p => `
+    <div class="picker-card rose" onclick="togglePlatform(this, '${p.name}')">
+      <span class="picker-icon">${p.icon}</span>
+      <div class="picker-name">${p.name}</div>
+    </div>
+  `).join('');
+}
+
+function togglePlatform(el, name) {
+  el.classList.toggle('sel');
+  if (el.classList.contains('sel')) {
+    if (!S.selectedPlatforms.includes(name)) S.selectedPlatforms.push(name);
+  } else {
+    S.selectedPlatforms = S.selectedPlatforms.filter(p => p !== name);
+  }
+}
+
+function buildMarketGrid() {
+  const grid = document.getElementById('marketGrid');
+  if (!grid) return;
+  grid.innerHTML = MARKETPLACES.map(m => `
+    <div class="picker-card" onclick="selectMarket(this, '${m.name}')">
+      <span class="picker-icon">${m.icon}</span>
+      <div class="picker-name">${m.name}</div>
+      <div class="picker-note">${m.note}</div>
+    </div>
+  `).join('');
+}
+
+function selectMarket(el, name) {
+  document.querySelectorAll('#marketGrid .picker-card').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  S.selectedMarket = name;
+}
+
+// ═══════════════════════════════════════════
+// PROGRESS & STORAGE
+// ═══════════════════════════════════════════
+function markDone(id) {
+  S.completed.add(id);
+  debouncedSave();
+  const chk = document.getElementById('chk-' + id);
+  if (chk) chk.classList.remove('hidden');
+  updateProgress();
+  saveData();
+  buildToolGrid(null);
+}
+
+function updateProgress() {
+  const done = TRACKED.filter(t => S.completed.has(t)).length;
+  const pct = Math.round((done / TRACKED.length) * 100);
+  document.getElementById('psFill').style.width = pct + '%';
+  document.getElementById('psLabel').textContent = done + ' of ' + TRACKED.length + ' complete';
+  document.getElementById('navProgFill').style.width = pct + '%';
+  document.getElementById('navProgTxt').textContent = done + ' / ' + TRACKED.length;
+  document.getElementById('sbFill').style.width = pct + '%';
+  if (S.skills) {
+    document.getElementById('sbName').textContent = S.skills.split(' ').slice(0, 5).join(' ') + '…';
+    document.getElementById('sbSub').textContent = pct + '% complete · ' + done + ' done';
+  }
+}
+
+function saveData() {
+  debouncedSave();
+  try {
+    const data = {
+      skills: S.skills, audience: S.audience,
+      productType: S.productType, priceRange: S.priceRange,
+      platform: S.platform, audienceSize: S.audienceSize,
+      idea: S.idea, ideaAudience: S.ideaAudience,
+      selectedFormat: S.selectedFormat,
+      completed: [...S.completed],
+      outputs: {}
+    };
+    TRACKED.forEach(id => { if (S[id]) data.outputs[id] = S[id]; });
+    localStorage.setItem('prodigy_v1', JSON.stringify(data));
+  } catch (e) {}
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem('prodigy_v1');
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (d.skills) {
+      document.getElementById('restoreText').textContent = d.skills.substring(0, 80) + '…';
+      document.getElementById('restoreBanner').classList.remove('hidden');
+      window._savedData = d;
+    }
+  } catch (e) {}
+}
+
+function doRestore() {
+  const d = window._savedData;
+  if (!d) return;
+  ['skills','audience','productType','priceRange','platform','audienceSize'].forEach(k => {
+    const el = document.getElementById(k);
+    if (el && d[k]) el.value = d[k];
+    if (d[k]) S[k] = d[k];
+  });
+  if (d.idea) S.idea = d.idea;
+  if (d.ideaAudience) S.ideaAudience = d.ideaAudience;
+  if (d.selectedFormat) S.selectedFormat = d.selectedFormat;
+  if (d.outputs) {
+    Object.entries(d.outputs).forEach(([id, html]) => {
+      S[id] = html;
+      const out = document.getElementById(id + 'Output');
+      if (out) { out.innerHTML = html; out.classList.remove('hidden'); }
+      const load = document.getElementById(id + 'Loading');
+      if (load) load.classList.add('hidden');
+      const btns = document.getElementById(id + 'Btns');
+      if (btns) btns.classList.remove('hidden');
+      out?.querySelector('.copy-section-body')?.classList.add('open');
+    });
+  }
+  if (d.completed) d.completed.forEach(id => {
+    S.completed.add(id);
+    const chk = document.getElementById('chk-' + id);
+    if (chk) chk.classList.remove('hidden');
+  });
+  document.getElementById('restoreBanner').classList.add('hidden');
+  updateProgress();
+  buildToolGrid(null);
+  toast('Profile restored ✓', 'success');
+}
+
+function clearData() {
+  localStorage.removeItem('prodigy_v1');
+  document.getElementById('restoreBanner').classList.add('hidden');
+  toast('Cleared', 'info');
+}
+
+// ═══════════════════════════════════════════
+// PROFILE
+// ═══════════════════════════════════════════
+function getProfile(silent = false) {
+  S.skills      = document.getElementById('skills').value.trim();
+  S.audience    = document.getElementById('audience').value.trim();
+  S.productType = document.getElementById('productType').value;
+  S.priceRange  = document.getElementById('priceRange').value;
+  S.platform    = document.getElementById('platform').value;
+  S.audienceSize= document.getElementById('audienceSize').value;
+  if (!S.skills || !S.audience) {
+    if (!silent) {
+      document.getElementById('profileError').innerHTML =
+        '<div class="error-box">⚠ Please fill in your skills and target audience to continue.</div>';
+      toast('Fill in skills and audience first', 'error');
+    }
+    return false;
+  }
+  document.getElementById('profileError').innerHTML = '';
+  markDone('profile');
+  saveData();
+  return true;
+}
+
+const pCtx = () =>
+  `Skills: ${S.skills || 'not set'}\nAudience: ${S.audience || 'not set'}\nProduct type: ${S.productType || 'AI decides'}\nPrice range: ${S.priceRange || 'AI decides'}\nPlatform: ${S.platform || 'not specified'}\nAudience size: ${S.audienceSize || 'not specified'}\nIdea: ${S.idea || 'not specified'}\nFormat: ${S.selectedFormat || 'not specified'}`;
+
+// ═══════════════════════════════════════════
+// RUN MODES
+// ═══════════════════════════════════════════
+async function runAll() {
+  if (!getProfile()) return;
+  toast('Generating all modules — this takes a few minutes', 'info');
+  for (const id of TRACKED) {
+    if (['marketing','listing','quiz'].includes(id)) continue;
+    goTo(id);
+    await runGen(id);
+    if (S[id]) markDone(id);
+  }
+  toast('All modules complete! 🎉', 'success');
+}
+
+async function runMVP() {
+  toast('⚡ MVP Mode — UVZ + Charter + Sales Page', 'info');
+  goTo('uvz'); await runGen('uvz'); if (S.uvz) markDone('uvz');
+  goTo('charter'); await runGen('charter'); if (S.charter) markDone('charter');
+  goTo('salespage'); await runGen('salespage'); if (S.salespage) markDone('salespage');
+  toast('MVP ready — you can launch now 🚀', 'success');
+}
+
+async function nextStep(cur, next) {
+  goTo(next);
+  await runGen(next);
+  if (S[next]) markDone(next);
+}
+
+async function rerun(id) {
+  S[id] = '';
+  await runGen(id);
+  if (S[id]) { markDone(id); toast(id + ' regenerated ✓', 'success'); }
+}
+
+// ═══════════════════════════════════════════
+// CLAUDE API
+// ═══════════════════════════════════════════
+const H = `Output ONLY clean HTML. No markdown, no code fences, no explanation.`;
+
+async function callClaude(system, user, tokens = 2200) {
+  // Calls our secure Netlify proxy — API key never exposed in browser
+  const res = await fetch('https://eom18ql3k7bgfo9.m.pipedream.net', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: tokens,
+      system,
+      messages: [{ role: 'user', content: user }]
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'API ' + res.status);
+  }
+  const d = await res.json();
+  return d.content.map(b => b.text || '').join('');
+}
+
+// ═══════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════
+function showLoad(id) {
+  document.getElementById(id + 'Loading')?.classList.remove('hidden');
+  const out = document.getElementById(id + 'Output');
+  if (out) out.classList.add('hidden');
+  document.getElementById(id + 'Btns')?.classList.add('hidden');
+  const err = document.getElementById(id + 'Error');
+  if (err) err.innerHTML = '';
+}
+
+function showOut(id, html) {
+  document.getElementById(id + 'Loading')?.classList.add('hidden');
+  const out = document.getElementById(id + 'Output');
+  if (out) { out.innerHTML = html; out.classList.remove('hidden'); }
+  document.getElementById(id + 'Btns')?.classList.remove('hidden');
+  out?.querySelector('.copy-section-body')?.classList.add('open');
+}
+
+function showErr(id, msg) {
+  document.getElementById(id + 'Loading')?.classList.add('hidden');
+  const err = document.getElementById(id + 'Error');
+  if (err) err.innerHTML = `<div class="error-box">⚠ ${msg} — <button onclick="rerun('${id}')" style="background:none;border:none;color:var(--violet);cursor:pointer;text-decoration:underline;font-size:13px;font-weight:600">Try again</button></div>`;
+  toast('Error generating ' + id, 'error');
+}
+
+function toggleSec(el) {
+  const body = el.nextElementSibling;
+  body.classList.toggle('open');
+  const chev = el.querySelector('.cs-chevron');
+  if (chev) chev.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
+}
+
+function copyOutput(id) {
+  const el = document.getElementById(id + 'Output');
+  if (!el) return;
+  navigator.clipboard.writeText(el.innerText)
+    .then(() => toast('Copied ✓', 'success'))
+    .catch(() => toast('Copy failed', 'error'));
+}
+
+function editOutput(id) {
+  const el = document.getElementById(id + 'Output');
+  if (!el) return;
+  const editing = el.contentEditable === 'true';
+  if (editing) {
+    el.contentEditable = 'false';
+    el.style.outline = '';
+    S[id] = el.innerHTML;
+    saveData();
+    const btn = document.getElementById('editBtn-' + id);
+    if (btn) { btn.textContent = '✏ Edit'; btn.style.color = ''; }
+    toast('Edits saved ✓', 'success');
+  } else {
+    el.contentEditable = 'true';
+    el.style.outline = '2px dashed rgba(109,74,255,0.3)';
+    el.style.borderRadius = '8px';
+    el.focus();
+    const btn = document.getElementById('editBtn-' + id);
+    if (btn) { btn.textContent = '💾 Save'; btn.style.color = 'var(--sage)'; }
+    toast('Edit mode — click Save when done', 'info');
+  }
+}
+
+function toast(msg, type = 'info') {
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  const icons = { success: '✓', error: '✗', info: '✦' };
+  el.innerHTML = `<span>${icons[type] || '✦'}</span><span>${msg}</span>`;
+  wrap.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(14px)';
+    el.style.transition = 'all 0.3s';
+    setTimeout(() => el.remove(), 300);
+  }, 3200);
+}
+
+// ═══════════════════════════════════════════
+// EXPORT MODAL
+// ═══════════════════════════════════════════
+function openModal() {
+  const list = document.getElementById('exportList');
+  list.innerHTML = TRACKED.map(id => {
+    const m = MODULE_META.find(x => x.id === id) || { icon: '', title: id };
+    const done = S.completed.has(id);
+    return `<div class="export-row">
+      <input type="checkbox" id="ex-${id}" ${done ? 'checked' : 'disabled'}>
+      <label for="ex-${id}">${m.icon} ${m.title}</label>
+      <span class="export-status ${done ? 'done' : 'lock'}">${done ? 'READY' : '—'}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('exportModal').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('exportModal').classList.add('hidden');
+}
+
+function doExport() {
+  const sel = TRACKED.filter(id => {
+    const cb = document.getElementById('ex-' + id);
+    return cb && cb.checked && S[id];
+  });
+  if (!sel.length) { toast('No completed modules selected', 'error'); return; }
+  const win = window.open('', '_blank');
+  const productName = (S.names || '').replace(/<[^>]+>/g, '').substring(0, 50) || 'My Digital Product';
+  win.document.write(`<!DOCTYPE html><html><head><title>Prodigy — Product Kit</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Georgia,serif;color:#1C1814;background:#fff;padding:48px;max-width:900px;margin:0 auto}
+    h1{font-size:40px;font-weight:900;margin-bottom:8px}
+    .violet{color:#6D4AFF}
+    .cover{text-align:center;padding:80px 20px;margin-bottom:52px;border-bottom:2px solid #EDE8DE}
+    .badge{font-size:10px;letter-spacing:3px;color:#6D4AFF;text-transform:uppercase;font-family:monospace;margin-bottom:14px;display:block}
+    .sec{page-break-before:always;margin-bottom:52px}
+    .sec:first-child{page-break-before:avoid}
+    .sec-tag{font-size:9px;letter-spacing:2px;color:#6D4AFF;text-transform:uppercase;font-family:monospace;margin-bottom:8px}
+    .sec-title{font-size:28px;font-weight:800;border-bottom:2px solid #EDE8DE;padding-bottom:10px;margin-bottom:22px}
+    .sec-body{font-size:13px;line-height:1.8;color:#6B6560}
+    .sec-body h3{font-size:18px;color:#6D4AFF;margin:16px 0 8px;font-family:Georgia}
+    .sec-body strong{color:#1C1814}
+    .sec-body ul li{margin-left:18px;list-style:disc;margin-bottom:5px}
+    .sec-body table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+    .sec-body th{background:#EDEBFF;padding:9px 13px;border:1px solid #c4b5fd;font-weight:700;text-align:left}
+    .sec-body td{padding:8px 13px;border:1px solid #EDE8DE}
+    @media print{.sec{page-break-before:always}}
+  </style></head><body>`);
+  win.document.write(`<div class="cover">
+    <span class="badge">Prodigy — Digital Product Kit</span>
+    <h1 class="violet">${productName}</h1>
+    <div style="font-size:13px;color:#9E9890;margin-top:12px">${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · ${sel.length} modules</div>
+  </div>`);
+  sel.forEach(id => {
+    const m = MODULE_META.find(x => x.id === id) || { icon: '', title: id, group: '' };
+    const content = (S[id] || '')
+      .replace(/class="copy-section-body"/g, 'class="copy-section-body open"')
+      .replace(/display:none/g, '');
+    win.document.write(`<div class="sec">
+      <div class="sec-tag">${m.group}</div>
+      <div class="sec-title">${m.icon} ${m.title}</div>
+      <div class="sec-body">${content}</div>
+    </div>`);
+  });
+  win.document.write('</body></html>');
+  win.document.close();
+  setTimeout(() => win.print(), 600);
+  closeModal();
+  toast('PDF ready — use browser Print to save', 'success');
+}
+
+// ═══════════════════════════════════════════
+// GENERATE ROUTER
+// ═══════════════════════════════════════════
+async function runGen(id) {
+  const map = {
+    uvz: genUVZ, names: genNames, charter: genCharter,
+    templates: genTemplates, pricing: genPricing,
+    listing: genListing, welcome: genWelcome,
+    salespage: genSalesPage, emails: genEmails,
+    hooks: genHooks, script: genScript, brand: genBrand,
+    seo: genSEO, calendar: genCalendar, funnel: genFunnel,
+    onboarding: genOnboarding, affiliate: genAffiliate,
+    automation: genAutomation, legal: genLegal, kpis: genKPIs
+  };
+  if (map[id]) await map[id]();
+}
+
+// Standalone wrappers
+async function runSalespageSolo() {
+  const ctx = document.getElementById('salespageCtx').value.trim();
+  document.getElementById('salespageLoading').classList.remove('hidden');
+  await genSalesPage(ctx ? `\nProduct context: ${ctx}` : '');
+  document.getElementById('salespageLoading').classList.add('hidden');
+}
+async function runEmailsSolo() {
+  const ctx = document.getElementById('emailsCtx').value.trim();
+  document.getElementById('emailsLoading').classList.remove('hidden');
+  await genEmails(ctx ? `\nProduct: ${ctx}` : '');
+  document.getElementById('emailsLoading').classList.add('hidden');
+}
+async function runHooksSolo() {
+  const ctx = document.getElementById('hooksCtx').value.trim();
+  document.getElementById('hooksLoading').classList.remove('hidden');
+  await genHooks(ctx ? `\nNiche/Product: ${ctx}` : '');
+  document.getElementById('hooksLoading').classList.add('hidden');
+}
+async function runSEOSolo() {
+  const ctx = document.getElementById('seoCtx').value.trim();
+  document.getElementById('seoLoading').classList.remove('hidden');
+  await genSEO(ctx ? `\nNiche: ${ctx}` : '');
+  document.getElementById('seoLoading').classList.add('hidden');
+}
+
+// ═══════════════════════════════════════════
+// AI GENERATORS
+// ═══════════════════════════════════════════
+async function genUVZ() {
+  showLoad('uvz');
+  const sys = `${H}\nUse: <div class="hl-box"><div class="hl-tag">label</div><p>text</p></div>, <h3>, <ul><li>, <div class="tag-row"><span class="tag">tag</span></div>, <p>, <strong>.\nSections: 1) UVZ Statement (hl-box — 2 sharp sentences on the intersection), 2) Core Skill Pillars (ul×4 specific), 3) Audience Pain Points (ul×4 emotional), 4) Competitive Edge (p), 5) Niche Tags (tag-row×6), 6) Recommended Format (p). Be commercially sharp.`;
+  try {
+    const r = await callClaude(sys, pCtx());
+    S.uvz = r; showOut('uvz', r); saveData();
+  } catch (e) { showErr('uvz', 'Could not generate.'); }
+}
+
+async function genNames() {
+  showLoad('names');
+  const sys = `${H}\n10 product name options. Each: <div class="mod-card"><div class="mod-num">OPTION 01</div><h4>Name: Tagline</h4><p>Why it works, positioning angle, domain idea.</p></div>. Then: <div class="hl-box"><div class="hl-tag">TOP PICK</div><p>Best name with full reasoning.</p></div>. No generic words like mastery/academy/pro.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}\nUVZ: ${S.uvz}`);
+    S.names = r; showOut('names', r); saveData();
+  } catch (e) { showErr('names', 'Could not generate.'); }
+}
+
+async function genCharter() {
+  showLoad('charter');
+  const sys = `${H}\nUse: <div class="info-grid"><div class="info-cell"><div class="ic-label">l</div><div class="ic-val">v</div></div></div>, <div class="hl-box">, <h3>, <ul><li>, <div class="mod-card">.\nSections: 1) Product Overview info-grid (Name,Format,Duration,Price,Difficulty,Audience), 2) Transformation Promise hl-box (From X → To Y), 3) Ideal Customer ul×4, 4) Curriculum (7 mod-cards with title + 3 lessons each), 5) Differentiator p, 6) Quick Wins ul×3, 7) Upsell idea, 8) Testimonial Request Template.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}\nUVZ:${S.uvz}\nNames:${S.names}`, 2400);
+    S.charter = r; showOut('charter', r); saveData();
+  } catch (e) { showErr('charter', 'Could not generate.'); }
+}
+
+async function genTemplates() {
+  showLoad('templates');
+  const sys = `${H}\n5 practical worksheets as collapsible sections: <div class="copy-section"><div class="copy-section-head" onclick="toggleSec(this)"><h4>Name</h4><div class="csh-right"><span class="cs-tag blue">TEMPLATE</span><span class="cs-chevron">▾</span></div></div><div class="copy-section-body">[content]</div></div>\nEach: purpose description + <table class="data-table"> with real sample data + checklist <ul><li>. Make immediately usable.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}\nCharter:${S.charter}`, 2500);
+    S.templates = r; showOut('templates', r); saveData();
+  } catch (e) { showErr('templates', 'Could not generate.'); }
+}
+
+async function genPricing() {
+  showLoad('pricing');
+  const sys = `${H}\nUse: <div class="info-grid">, <div class="hl-box">, <div class="blue-box"><div class="bl-tag">l</div><p>text</p></div>, <h3>, <ul><li>, <table class="data-table">.\nSections: 1) Recommended Price hl-box (with psychology rationale), 2) Tiers table (Tier|Price|Includes|Who), 3) Payment Plans blue-box, 4) Anchor Pricing strategy, 5) Guarantee Copy, 6) Price Psychology ul×4, 7) Revenue Scenarios table (3 scenarios with monthly revenue).`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}\nCharter:${S.charter}`, 2200);
+    S.pricing = r; showOut('pricing', r); saveData();
+  } catch (e) { showErr('pricing', 'Could not generate.'); }
+}
+
+async function genListing() {
+  showLoad('listing');
+  const market = S.selectedMarket || 'Gumroad';
+  const ctx = document.getElementById('listingCtx')?.value.trim() || '';
+  const sys = `${H}\nWrite a profit-optimised product listing for ${market}.\nUse: <div class="hl-box">, <div class="blue-box">, collapsible sections with <div class="copy-section">.\nSections: 1) Product Title (3 options — keyword-rich, benefit-led) hl-box, 2) Short Description (150 chars — for search results), 3) Full Description (benefit bullets, who it's for, what's inside, transformation promise), 4) SEO Tags/Keywords (tag-row×10), 5) Pricing Recommendation, 6) Product Mockup Brief (what visuals to create), 7) ${market}-Specific Tips (what makes listings convert on this platform). Write specific copy, not placeholders.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}\nCharter:${S.charter}\nPricing:${S.pricing}\nExtra context:${ctx}`, 2300);
+    S.listing = r; showOut('listing', r); markDone('listing'); saveData();
+  } catch (e) { showErr('listing', 'Could not generate.'); }
+}
+
+async function genWelcome() {
+  showLoad('welcome');
+  const sys = `${H}\nGenerate a student welcome page. Use <div class="hl-box"><div class="hl-tag">WELCOME</div><p>Warm headline + personal message</p></div>, <h3>, <ul><li>, <div class="info-grid"><div class="info-cell">, <div class="blue-box">.\n1) Welcome headline + warm personal message, 2) Top 5 outcomes they just unlocked ul, 3) Start Here — 3 first steps, 4) Course structure info-grid (modules), 5) Community/support blue-box, 6) Motivational closing. Warm, exciting, professional.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}\nCharter:${S.charter}`, 2000);
+    S.welcome = r; showOut('welcome', r); saveData();
+  } catch (e) { showErr('welcome', 'Could not generate.'); }
+}
+
+async function genSalesPage(extra = '') {
+  showLoad('salespage');
+  const sys = `${H}\nFull sales page as collapsible sections: <div class="copy-section"><div class="copy-section-head" onclick="toggleSec(this)"><h4>Section</h4><div class="csh-right"><span class="cs-tag purple">SALES PAGE</span><span class="cs-chevron">▾</span></div></div><div class="copy-section-body">[copy]</div></div>\n10 sections: 1) Headlines (3 options), 2) Hook (2 paragraphs), 3) Dream Outcome, 4) What's Inside (benefits), 5) Who It's For/Not For, 6) Social Proof (3 templates), 7) Offer Stack (value stacking), 8) Guarantee, 9) FAQ (5 objections), 10) CTA+Urgency. REAL copy. Zero placeholders.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}${extra}\nCharter:${S.charter}\nPricing:${S.pricing}`, 2500);
+    S.salespage = r; showOut('salespage', r); markDone('salespage'); saveData();
+  } catch (e) { showErr('salespage', 'Could not generate.'); }
+}
+
+async function genEmails(extra = '') {
+  showLoad('emails');
+  const sys = `${H}\n5 launch emails as collapsible sections. cs-tag purple. Each: <strong>Subject:</strong>...<br><br><strong>Preview:</strong>...<br><br>[body]\nEmail 1(Day 1): Story. Email 2(Day 2): Problem. Email 3(Day 3): Solution. Email 4(Day 5): Proof. Email 5(Day 7): Last Chance. 250-400 words each. REAL copy.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}${extra}\nCharter:${S.charter}`, 2500);
+    S.emails = r; showOut('emails', r); markDone('emails'); saveData();
+  } catch (e) { showErr('emails', 'Could not generate.'); }
+}
+
+async function genHooks(extra = '') {
+  showLoad('hooks');
+  const sys = `${H}\nHooks and ads as collapsible sections cs-tag purple. 7 sections: 1)TikTok/Reels Hooks×12, 2)Twitter/X Threads×2(hook+6tweets), 3)FB/IG Ads×3(short/medium/long), 4)YouTube Titles×10, 5)Content Angles×8, 6)Cold DMs×3, 7)Pinterest Descriptions×5.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}${extra}\nCharter:${S.charter}`, 2500);
+    S.hooks = r; showOut('hooks', r); markDone('hooks'); saveData();
+  } catch (e) { showErr('hooks', 'Could not generate.'); }
+}
+
+async function genScript() {
+  showLoad('script');
+  const sys = `${H}\nWord-for-word launch script as collapsible sections cs-tag purple. 10 sections: 1)Hook(30s), 2)Story, 3)Problem+Agitation, 4)Solution Reveal, 5)What's Inside, 6)Social Proof, 7)Offer, 8)Objection Handling, 9)CTA+Urgency, 10)B-Roll Suggestions. Conversational, natural.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}\nCharter:${S.charter}`, 2500);
+    S.script = r; showOut('script', r); saveData();
+  } catch (e) { showErr('script', 'Could not generate.'); }
+}
+
+async function genBrand() {
+  showLoad('brand');
+  const sys = `${H}\nUse: <div class="hl-box">, <div class="blue-box">, <div class="purple-box"><div class="pl-tag">l</div><p>text</p></div>, <h3>, <ul><li>, <div class="info-grid">, <div class="tag-row">.\nSections: 1)Brand Personality hl-box(3 adjectives+archetype), 2)Tone of Voice, 3)Power Words tag-row×10, 4)Words to Avoid tag-row×6(rose tags), 5)Style Rules ul×5, 6)Colours info-grid(hex codes+names), 7)Font Pairings(2 combos), 8)Competitor Differentiation, 9)Brand Story Template.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}\nUVZ:${S.uvz}\nCharter:${S.charter}`, 2200);
+    S.brand = r; showOut('brand', r); saveData();
+  } catch (e) { showErr('brand', 'Could not generate.'); }
+}
+
+async function genMarketing() {
+  const platforms = S.selectedPlatforms;
+  if (!platforms.length) { toast('Select at least one platform', 'error'); return; }
+  const ctx = document.getElementById('mktProduct')?.value.trim() || '';
+  showLoad('marketing');
+  document.getElementById('marketingLoading').classList.remove('hidden');
+  const sys = `${H}\nCreate platform-specific marketing content as collapsible sections. Each platform gets its own section: <div class="copy-section"><div class="copy-section-head" onclick="toggleSec(this)"><h4>Platform Name</h4><div class="csh-right"><span class="cs-tag green">CONTENT</span><span class="cs-chevron">▾</span></div></div><div class="copy-section-body">[content]</div></div>\nFor each platform provide: 5 hooks (scroll-stopping openers), 3 full captions (ready to copy-paste, 80-150 words each), 10 hashtags, 2 story/reel ideas, 1 pinned post concept. Make everything specific to the niche and product, not generic.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}\nPlatforms: ${platforms.join(', ')}\nProduct:${S.charter ? S.charter.replace(/<[^>]+>/g,'').substring(0,300) : ctx}`, 2500);
+    S.marketing = r; showOut('marketing', r); markDone('marketing'); saveData();
+  } catch (e) { showErr('marketing', 'Could not generate.'); }
+  document.getElementById('marketingLoading').classList.add('hidden');
+}
+
+async function genSEO(extra = '') {
+  showLoad('seo');
+  const sys = `${H}\nWrite a complete SEO blog post. First show: <div class="seo-meta-grid"><div class="seo-cell"><div class="sc-lbl">Target Keyword</div><div class="sc-val">keyword</div></div>...</div> with 6 cells: Target Keyword, Secondary Keywords, Word Count, Reading Time, Meta Description, URL Slug.\nThen the full article as collapsible sections cs-tag green: 1)Hook Opening, 2)The Problem, 3)Main Content(3-4 sections), 4)Your Solution, 5)Step-by-Step Guide, 6)Conclusion+CTA, 7)Meta Tags. 1,200-1,500 words. Conversational, Google-friendly.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}${extra}\nProduct:${S.charter ? S.charter.replace(/<[^>]+>/g,'').substring(0,300) : ''}`, 2500);
+    S.seo = r; showOut('seo', r); saveData(); markDone('seo');
+  } catch (e) { showErr('seo', 'Could not generate.'); }
+  document.getElementById('seoLoading')?.classList.add('hidden');
+}
+
+async function genCalendar() {
+  showLoad('calendar');
+  const sys = `${H}\n30-day content calendar as 4 collapsible weekly sections cs-tag green. Each week 5 days (Mon-Fri). Each day:\n<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">\n<strong>Day X — Platform</strong><br>\n<span style="color:var(--violet);font-size:12px">🪝 HOOK:</span> [hook]<br>\n<span style="color:var(--ink-3);font-size:13px">Caption: [50-100 word caption]</span><br>\n<span style="color:var(--ink-4);font-size:11px">#tag1 #tag2 #tag3</span>\n</div>\nWeek 1: Awareness. Week 2: Education. Week 3: Proof+Teaser. Week 4: Launch+Urgency. Niche-specific.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}\nProduct:${S.charter ? S.charter.replace(/<[^>]+>/g,'').substring(0,300) : ''}`, 2500);
+    S.calendar = r; showOut('calendar', r); saveData();
+  } catch (e) { showErr('calendar', 'Could not generate.'); }
+}
+
+async function genFunnel() {
+  showLoad('funnel');
+  const sys = `${H}\nComplete sales funnel as collapsible sections cs-tag green. 10 sections: 1)Funnel Map(text diagram+conv%), 2)Lead Magnet(full desc+opt-in copy), 3)Landing Page Copy, 4)Core Offer Page, 5)Order Bump($+copy), 6)Upsell#1, 7)Downsell, 8)Thank You Page, 9)Traffic Strategy(3 organic+paid), 10)30-Day Launch Plan(week by week).`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}\nCharter:${S.charter}\nPricing:${S.pricing}`, 2500);
+    S.funnel = r; showOut('funnel', r); saveData();
+  } catch (e) { showErr('funnel', 'Could not generate.'); }
+}
+
+async function genOnboarding() {
+  showLoad('onboarding');
+  const sys = `${H}\nPost-purchase onboarding as collapsible sections cs-tag green. 8 sections: 1)Instant Access Email(full), 2)Day 1 Welcome(full), 3)Day 3 Check-in(full), 4)Day 7 Progress(full), 5)Day 14 Testimonial Request(full+template), 6)Refund Prevention Script, 7)First 7 Days Checklist(table), 8)New Buyer FAQ(5 Q&A).`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}\nCharter:${S.charter}`, 2400);
+    S.onboarding = r; showOut('onboarding', r); saveData();
+  } catch (e) { showErr('onboarding', 'Could not generate.'); }
+}
+
+async function genAffiliate() {
+  showLoad('affiliate');
+  const sys = `${H}\nAffiliate programme as collapsible sections cs-tag green. 8 sections: 1)Overview info-grid(commission/cookie/payout), 2)Recruitment Email(full), 3)Welcome Kit, 4)Swipe Copy×3(full emails), 5)Social Swipe×5, 6)JV Partner Pitch(full), 7)Guidelines, 8)Incentive Structure.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}\nCharter:${S.charter}\nPricing:${S.pricing}`, 2300);
+    S.affiliate = r; showOut('affiliate', r); saveData();
+  } catch (e) { showErr('affiliate', 'Could not generate.'); }
+}
+
+async function genAutomation() {
+  showLoad('automation');
+  const sys = `${H}\nComplete automation guide using <div class="hl-box">, <div class="blue-box">, <div class="auto-flow"><div class="auto-step"><div class="auto-icon-col"><div class="auto-circle">emoji</div><div class="auto-line"></div></div><div class="auto-content"><h4>Step</h4><p>Instructions.</p><span class="auto-tool">Tool: name</span></div></div></div>, <div class="info-grid">, <h3>, <ul><li>.\nSections: 1)Tech Stack hl-box(5 tools), 2)Automation Flow(8 steps: Lead→Email→Welcome→Delivery→Upsell→Testimonial→Abandoned→Re-engage), 3)Zapier Recipes(5 Trigger→Action), 4)Free vs Paid info-grid, 5)Setup Priority, 6)Mistakes ul×5.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}\nProduct:${S.charter ? S.charter.replace(/<[^>]+>/g,'').substring(0,200) : ''}`, 2300);
+    S.automation = r; showOut('automation', r); saveData();
+  } catch (e) { showErr('automation', 'Could not generate.'); }
+}
+
+async function genLegal() {
+  showLoad('legal');
+  const sys = `${H}\nLegal templates as collapsible sections cs-tag blue. Add blue-box disclaimer at top. 6 sections: 1)Refund Policy(complete), 2)Terms of Service(key clauses), 3)Earnings Disclaimer(FTC-compliant), 4)Privacy Policy Summary, 5)Testimonial Disclaimer, 6)Affiliate Disclosure.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}\nCharter:${S.charter}`, 2200);
+    S.legal = r; showOut('legal', r); saveData();
+  } catch (e) { showErr('legal', 'Could not generate.'); }
+}
+
+async function genKPIs() {
+  showLoad('kpis');
+  const sys = `${H}\nUse: <div class="info-grid">, <table class="data-table">, <div class="hl-box">, <div class="blue-box">, <h3>, <ul><li>.\nSections: 1)KPI Dashboard info-grid(8 metrics+targets), 2)Funnel Benchmarks table(Stage|Average|Good|Target), 3)90-Day Revenue table(3 scenarios monthly), 4)Weekly Checklist ul×8, 5)Top 5 Growth Levers, 6)Paid Ad Readiness signals, 7)Red Flag Metrics ul×5.`;
+  try {
+    const r = await callClaude(sys, `${pCtx()}\nCharter:${S.charter}\nPricing:${S.pricing}`, 2300);
+    S.kpis = r; showOut('kpis', r); saveData();
+  } catch (e) { showErr('kpis', 'Could not generate.'); }
+}
+
+// Quiz
+async function runQuiz() {
+  const topic = document.getElementById('quizTopic').value.trim();
+  const count = document.getElementById('quizCount').value;
+  const type  = document.getElementById('quizType').value;
+  const diff  = document.getElementById('quizDiff').value;
+  const L = document.getElementById('quizLoading');
+  const O = document.getElementById('quizOutput');
+  const E = document.getElementById('quizError');
+  L.classList.remove('hidden'); O.classList.add('hidden'); E.innerHTML = '';
+  const sys = `${H}\nGenerate ${count} quiz questions at ${diff} level on: ${topic || 'the full course'}.\nEach: <div class="quiz-q"><div class="q-num">QUESTION 01</div><div class="q-text">Question?</div><div class="q-opts"><div class="q-opt">A) option</div><div class="q-opt correct">B) correct ✓</div><div class="q-opt">C) option</div><div class="q-opt">D) option</div></div><div class="q-explain">Explanation: why B is correct.</div></div>\nType: ${type}. True/false = 2 options. Short answer = model answer in q-explain.`;
+  try {
+    const r = await callClaude(sys, `Course:${S.charter ? S.charter.replace(/<[^>]+>/g,'').substring(0,400) : pCtx()}\nTopic:${topic || 'full course'}`, 2000);
+    S.quiz = r; O.innerHTML = r; O.classList.remove('hidden'); markDone('quiz');
+    toast('Quiz ready ✓', 'success');
+  } catch (e) {
+    E.innerHTML = '<div class="error-box">⚠ Could not generate quiz. <button onclick="runQuiz()" style="background:none;border:none;color:var(--violet);cursor:pointer;text-decoration:underline;font-weight:600">Retry</button></div>';
+    toast('Quiz error', 'error');
+  }
+  L.classList.add('hidden');
+}
+
+// ═══════════════════════════════════════════
+// AI COACH
+// ═══════════════════════════════════════════
+const coachHistory = [];
+
+async function sendCoach() {
+  const inp = document.getElementById('coachInput');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+  await askCoach(msg);
+}
+
+async function askCoach(msg) {
+  const msgs = document.getElementById('coachMsgs');
+  coachHistory.push({ role: 'user', content: msg });
+  msgs.innerHTML += `<div class="mmsg user"><div class="mmsg-av">👤</div><div class="mmsg-bub">${msg}</div></div>`;
+  const tid = 'c' + Date.now();
+  msgs.innerHTML += `<div class="mmsg mentor" id="${tid}"><div class="mmsg-av">✦</div><div class="mmsg-bub"><span class="tdot"></span><span class="tdot"></span><span class="tdot"></span></div></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  const sys = `You are an expert AI business coach for digital product creators. Direct, specific, commercially sharp, and encouraging.
+
+User Profile: ${pCtx()}
+Completed: ${[...S.completed].join(', ') || 'None yet'}
+Charter: ${S.charter ? S.charter.replace(/<[^>]+>/g,'').substring(0,200) : 'Not yet'}
+
+Rules: Be specific to their actual niche/skills/product. Never generic. Like a top mentor — honest, direct, warm. 3-5 sentences max unless asked for detail. Bullet points only for steps. Bold key phrases with <strong>.`;
+
+  try {
+    const res = await fetch('https://eom18ql3k7bgfo9.m.pipedream.net', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 600, system: sys, messages: coachHistory })
+    });
+    const data = await res.json();
+    const reply = data.content?.map(b => b.text || '').join('') || 'Sorry, try again.';
+    coachHistory.push({ role: 'assistant', content: reply });
+    document.getElementById(tid).querySelector('.mmsg-bub').innerHTML =
+      reply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  } catch (e) {
+    document.getElementById(tid).querySelector('.mmsg-bub').textContent = 'Connection error. Please retry.';
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ═══════════════════════════════════════════
+// IMAGE LIBRARY
+// ═══════════════════════════════════════════
+const imgSelArr = [];
+
+function doImgSearch() {
+  const q = document.getElementById('imgQ').value.trim();
+  if (!q) { toast('Enter a search term', 'error'); return; }
+  runImgSearch(q);
+}
+
+function autoImgSearch() {
+  if (!S.skills) { toast('Add your skills in Profile first', 'error'); return; }
+  const q = S.skills.split(' ').filter(w => w.length > 3).slice(0, 3).join(' ');
+  document.getElementById('imgQ').value = q;
+  runImgSearch(q);
+}
+
+function runImgSearch(q) {
+  const grid = document.getElementById('imgGrid');
+  grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--ink-4);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px">LOADING...</div>`;
+  const base = q.split(' ').filter(w => w.length > 2)[0] || q;
+  const terms = [q, base, base+' tools', base+' professional', base+' workspace', base+' tutorial', q+' course', base+' detail', base+' closeup', base+' expert', base+' craft', q+' setup'];
+  grid.innerHTML = '';
+  terms.slice(0, 12).forEach((t, i) => {
+    const seed = (Date.now() % 9999) + i * 41;
+    const url = `https://source.unsplash.com/280x210/?${encodeURIComponent(t)}&sig=${seed}`;
+    const card = document.createElement('div');
+    card.style.cssText = 'position:relative;border-radius:10px;overflow:hidden;border:1.5px solid var(--border);cursor:pointer;transition:all 0.2s;aspect-ratio:4/3;background:var(--cream-2);';
+    card.innerHTML = `<img src="${url}" loading="lazy" style="width:100%;height:100%;object-fit:cover"><div style="position:absolute;inset:0;background:rgba(109,74,255,0.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s;font-size:22px">✓</div><div style="position:absolute;bottom:0;left:0;right:0;background:rgba(28,24,20,0.75);font-size:9px;color:var(--cream);padding:4px 8px;font-family:'DM Mono',monospace">${t}</div>`;
+    card.onmouseenter = () => { if (!card.dataset.sel) card.querySelectorAll('div')[0].style.opacity = '0.6'; };
+    card.onmouseleave = () => { if (!card.dataset.sel) card.querySelectorAll('div')[0].style.opacity = '0'; };
+    card.onclick = () => toggleImgSel(card, url, t);
+    grid.appendChild(card);
+  });
+  toast(`Images loaded for "${q}"`, 'info');
+}
+
+function toggleImgSel(card, url, label) {
+  const idx = imgSelArr.findIndex(i => i.url === url);
+  if (idx >= 0) {
+    imgSelArr.splice(idx, 1);
+    card.style.borderColor = 'var(--border)';
+    card.dataset.sel = '';
+    card.querySelectorAll('div')[0].style.opacity = '0';
+  } else {
+    imgSelArr.push({ url, label });
+    card.style.borderColor = 'var(--violet)';
+    card.dataset.sel = '1';
+    card.querySelectorAll('div')[0].style.opacity = '1';
+  }
+  S.selectedImages = [...imgSelArr];
+  renderImgSel();
+}
+
+function renderImgSel() {
+  const sec = document.getElementById('imgSelSection');
+  const cnt = document.getElementById('imgSelCount');
+  const wrap = document.getElementById('imgSelWrap');
+  cnt.textContent = imgSelArr.length;
+  if (!imgSelArr.length) { sec.classList.add('hidden'); return; }
+  sec.classList.remove('hidden');
+  wrap.innerHTML = imgSelArr.map((img, i) =>
+    `<div style="width:68px;height:51px;border-radius:8px;overflow:hidden;border:1.5px solid var(--border);position:relative;flex-shrink:0">
+      <img src="${img.url}" style="width:100%;height:100%;object-fit:cover">
+      <button onclick="removeImgSel(${i})" style="position:absolute;top:2px;right:2px;background:var(--rose);color:white;border:none;border-radius:50%;width:14px;height:14px;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+    </div>`
+  ).join('');
+}
+
+function removeImgSel(i) { imgSelArr.splice(i, 1); S.selectedImages = [...imgSelArr]; renderImgSel(); }
+function clearImgSel() { imgSelArr.length = 0; S.selectedImages = []; renderImgSel(); document.querySelectorAll('#imgGrid > div').forEach(c => { c.style.borderColor = 'var(--border)'; c.dataset.sel = ''; }); }
+
+// ═══════════════════════════════════════════
+// AI IMAGE STUDIO
+// ═══════════════════════════════════════════
+let currentStyle = 'Course Cover';
+
+function pickStyle(el, s) {
+  document.querySelectorAll('.style-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  currentStyle = s;
+}
+
+function autoImgPrompt() {
+  if (!S.skills) { toast('Fill your profile first', 'error'); return; }
+  const mood = document.getElementById('imgMood').value;
+  const hint = S.charter ? S.charter.replace(/<[^>]+>/g,'').substring(0, 60) : S.skills.substring(0, 50);
+  document.getElementById('imgPrompt').value = `${currentStyle} for: ${hint}. Mood: ${mood}. Professional, high quality.`;
+  toast('Prompt generated ✓', 'success');
+}
+
+async function runAIImage() {
+  const prompt = document.getElementById('imgPrompt').value.trim();
+  if (!prompt) { toast('Enter a description first', 'error'); return; }
+  const ratio = document.getElementById('imgRatio').value;
+  const mood  = document.getElementById('imgMood').value;
+  const L = document.getElementById('imgGenLoading');
+  const R = document.getElementById('imgGenResult');
+  L.classList.remove('hidden'); R.classList.add('hidden');
+  document.getElementById('imgGenError').innerHTML = '';
+  try {
+    const sys = 'Output ONLY raw JSON: {"queries":["q1","q2","q3","q4"],"desc":"1 sentence"}. 2-4 word Unsplash queries. No markdown.';
+    const r = await callClaude(sys, `Image: ${prompt}. Style: ${currentStyle}. Mood: ${mood}. Ratio: ${ratio}.`, 300);
+    let parsed;
+    try { parsed = JSON.parse(r.trim()); }
+    catch { const m = r.match(/\{[\s\S]*\}/); parsed = m ? JSON.parse(m[0]) : { queries: [prompt, 'professional', 'creative', 'modern'] }; }
+    const queries = parsed.queries || [prompt, 'professional', 'design', 'creative'];
+    const sizeMap = { square: '400x400', landscape: '800x450', portrait: '400x600' };
+    const sz = sizeMap[ratio] || '400x400';
+    R.innerHTML = `<div class="img-gen-grid">${queries.slice(0, 4).map((q, i) => {
+      const seed = Math.floor(Math.random() * 9999) + i * 131;
+      const url = `https://source.unsplash.com/${sz}/?${encodeURIComponent(q)}&sig=${seed}`;
+      return `<div class="img-slot"><img src="${url}" loading="lazy"><div class="img-overlay"><button class="btn btn-violet btn-xs" onclick="saveGenImg('${url}','${q.replace(/'/g,'`')}')">💾 Save</button><a href="${url}" target="_blank" class="btn btn-outline btn-xs" style="text-decoration:none;color:var(--cream);border-color:rgba(255,255,255,0.3)">⬇</a></div></div>`;
+    }).join('')}</div><p style="font-size:11px;color:var(--ink-4);margin-top:10px;font-family:'DM Mono',monospace">✦ ${parsed.desc || 'AI-matched from Unsplash'}</p>`;
+    R.classList.remove('hidden');
+    toast('Images generated ✓', 'success');
+  } catch (e) {
+    document.getElementById('imgGenError').innerHTML = '<div class="error-box">⚠ Could not generate. Try again.</div>';
+    R.classList.remove('hidden');
+    toast('Error', 'error');
+  }
+  L.classList.add('hidden');
+}
+
+function saveGenImg(url, q) {
+  if (!S.savedImages) S.savedImages = [];
+  S.savedImages.push({ url, q });
+  refreshSavedImgs();
+  toast('Saved ✓', 'success');
+}
+
+function refreshSavedImgs() {
+  const row  = document.getElementById('savedImgsRow');
+  const card = document.getElementById('savedImgCard');
+  const cnt  = document.getElementById('savedImgCount');
+  if (!row || !S.savedImages) return;
+  cnt.textContent = S.savedImages.length;
+  if (S.savedImages.length) card.classList.remove('hidden'); else card.classList.add('hidden');
+  row.innerHTML = (S.savedImages || []).map((img, i) =>
+    `<div class="saved-thumb" onclick="removeGenImg(${i})" title="Click to remove"><img src="${img.url}" alt="${img.q}"></div>`
+  ).join('');
+}
+
+function removeGenImg(i) { if (!S.savedImages) return; S.savedImages.splice(i, 1); refreshSavedImgs(); toast('Removed', 'info'); }
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  initSupabaseAuth();
+  loadData();
+  buildWings();
+  buildToolGrid(null);
+  buildPlatformGrid();
+  buildMarketGrid();
+  refreshSavedImgs();
+
+  document.getElementById('exportModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  document.getElementById('authModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeAuthModal();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+  });
+});
+
+</script>
+</body>
+</html>
